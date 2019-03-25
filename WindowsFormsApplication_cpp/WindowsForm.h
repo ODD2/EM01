@@ -1,6 +1,7 @@
 #pragma once
 #include"DataManager.h"
 #include"DotNetUtilities.h"
+#include <msclr\marshal_cppstd.h>
 
 namespace WindowsFormsApplication_cpp {
 
@@ -80,6 +81,10 @@ namespace WindowsFormsApplication_cpp {
 			String^ userInput;
 			int lastInputLength;
 	private: System::Windows::Forms::OpenFileDialog^  openFileDialog1;
+	private: System::Windows::Forms::ToolStripMenuItem^  LoadMatrixToolStripMenuItem;
+	private: System::Windows::Forms::OpenFileDialog^  openFileDialog2;
+	private: int contextOP = 0;
+
 			 /// </summary>
 		System::ComponentModel::Container ^components;
 
@@ -93,6 +98,7 @@ namespace WindowsFormsApplication_cpp {
 			this->menuStrip2 = (gcnew System::Windows::Forms::MenuStrip());
 			this->FileToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->LoadVectorToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			this->LoadMatrixToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->tableLayoutPanel1 = (gcnew System::Windows::Forms::TableLayoutPanel());
 			this->flowLayoutPanel1 = (gcnew System::Windows::Forms::FlowLayoutPanel());
 			this->InputLabel = (gcnew System::Windows::Forms::Label());
@@ -103,6 +109,7 @@ namespace WindowsFormsApplication_cpp {
 			this->OutputLabel = (gcnew System::Windows::Forms::Label());
 			this->Output = (gcnew System::Windows::Forms::TextBox());
 			this->openFileDialog1 = (gcnew System::Windows::Forms::OpenFileDialog());
+			this->openFileDialog2 = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->menuStrip2->SuspendLayout();
 			this->tableLayoutPanel1->SuspendLayout();
 			this->flowLayoutPanel1->SuspendLayout();
@@ -120,7 +127,10 @@ namespace WindowsFormsApplication_cpp {
 			// 
 			// FileToolStripMenuItem
 			// 
-			this->FileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->LoadVectorToolStripMenuItem });
+			this->FileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {
+				this->LoadVectorToolStripMenuItem,
+					this->LoadMatrixToolStripMenuItem
+			});
 			this->FileToolStripMenuItem->Name = L"FileToolStripMenuItem";
 			this->FileToolStripMenuItem->Size = System::Drawing::Size(38, 20);
 			this->FileToolStripMenuItem->Text = L"File";
@@ -131,6 +141,13 @@ namespace WindowsFormsApplication_cpp {
 			this->LoadVectorToolStripMenuItem->Size = System::Drawing::Size(180, 22);
 			this->LoadVectorToolStripMenuItem->Text = L"Load Vector";
 			this->LoadVectorToolStripMenuItem->Click += gcnew System::EventHandler(this, &WindowsForm::LoadVectorToolStripMenuItem_Click);
+			// 
+			// LoadMatrixToolStripMenuItem
+			// 
+			this->LoadMatrixToolStripMenuItem->Name = L"LoadMatrixToolStripMenuItem";
+			this->LoadMatrixToolStripMenuItem->Size = System::Drawing::Size(180, 22);
+			this->LoadMatrixToolStripMenuItem->Text = L"Load Matrix";
+			this->LoadMatrixToolStripMenuItem->Click += gcnew System::EventHandler(this, &WindowsForm::LoadMatrixToolStripMenuItem_Click);
 			// 
 			// tableLayoutPanel1
 			// 
@@ -240,6 +257,11 @@ namespace WindowsFormsApplication_cpp {
 			this->openFileDialog1->FileName = L"openFileDialog1";
 			this->openFileDialog1->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &WindowsForm::openFileDialog1_FileOk);
 			// 
+			// openFileDialog2
+			// 
+			this->openFileDialog2->FileName = L"openFileDialog2";
+			this->openFileDialog2->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &WindowsForm::openFileDialog2_FileOk);
+			// 
 			// WindowsForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
@@ -265,55 +287,198 @@ namespace WindowsFormsApplication_cpp {
 
 private: System::Void WindowsForm_Load(System::Object^  sender, System::EventArgs^  e) {
 }
-
 private: System::Void LoadVectorToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
 {
 	//開啟Dialog
 	openFileDialog1->ShowDialog();
 }
+private: System::Void LoadMatrixToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
+	 //開啟Dialog
+	 openFileDialog2->ShowDialog();
+}
 private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e)
 {
 	//當Input textbox中的輸入改變時，便會進入此函式
 	//取得向量資料
-	std::vector<Vector> vectors = dataManager->GetVectors();
+	std::map<std::string,Vector>& vectors = dataManager->GetVectors();
+	msclr::interop::marshal_context context;
+
 	//判斷輸入自元為'\n'，並防止取到字串-1位置
 	if (Input->Text->Length-1 >= 0 &&Input->Text[Input->Text->Length - 1] == '\n')
 	{
+		Output->Text = "";
 		//將使用者輸入字串(在userInput中)，依空白作切割
 		array<String^> ^userCommand = userInput->Split(' ');
-		//字串比較，若指令為"print"的情況
-		if (userCommand[0] == "print")
-		{
-			//定意輸出暫存
-			String^ outputTemp = "";
-			//透過for迴圈，從向量資料中找出對應變數
-			for (unsigned int i = 0; i < vectors.size();i++)
+		//Vector環境
+		if (contextOP == 0) {
+			//字串比較，若指令為"print"的情況
+			if (userCommand[0] == "Print")
 			{
+				//定意輸出暫存
+				String^ outputTemp = "";
+				std::string vname = context.marshal_as<std::string>(userCommand[1]);
 				//若變數名稱與指令變數名稱符合
-				if (userCommand[1] == gcnew String(vectors[i].Name.c_str()))
+				if (vectors.count(vname))
 				{
+					Vector& target = vectors[vname];
 					//將輸出格式存入暫存
 					outputTemp += "[";
 					//將輸出資料存入暫存
-					for (unsigned int j = 0; j<vectors[i].Data.size(); j++)
+					for (unsigned int j = 0; j < target.Data.size(); j++)
 					{
-						outputTemp += vectors[i].Data[j].ToString();
-						if (j != vectors[i].Data.size() - 1)
+						outputTemp += target.Data[j].ToString();
+						if (j != target.Data.size() - 1)
 							outputTemp += ",";
 					}
 					//將輸出格式存入暫存，並且換行
 					outputTemp += "]" + Environment::NewLine;
 					//輸出暫存資訊
-					Output->Text += gcnew String(vectors[i].Name.c_str()) +" = "+ outputTemp;
-					break;
+					Output->Text += userCommand[1] + " = " + outputTemp;
 				}
 			}
+			else if (userCommand[0] == "Norm") {
+				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+				//std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+				if (vectors.count(left_v) == 0) {
+					Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+				}
+				else {
+					double val = length(vectors[left_v])[0];
+					Output->Text += "Norm(" + userCommand[1] + ") = " + val.ToString() + Environment::NewLine;
+				}
+			}
+			else if (userCommand[0] == "Normal") {
+				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+				if (vectors.count(left_v) == 0) {
+					Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+				}
+				else {
+					Vector vec = nrmlz(vectors[left_v]);
+					Output->Text += "Normal(" + userCommand[1] + ") = [ ";
+					for (int i = 0; i < vec.dim(); i++) {
+						Output->Text += vec[i].ToString() + " ";
+					}
+					Output->Text += "]"+ Environment::NewLine;
+				}
+			}
+			else if (userCommand[0] == "Cross") {
+
+			}
+			else if (userCommand[0] == "Com") {
+
+			}
+			else if (userCommand[0] == "Proj") {
+
+			}
+			else if (userCommand[0] == "Area") {
+
+			}
+			else if (userCommand[0] == "isParallel") {
+
+			}
+			else if (userCommand[0] == "isOrthogonal") {
+
+			}
+			else if (userCommand[0] == "angle") {
+
+			}
+			else if (userCommand[0] == "Calc") {
+				
+				std::vector<std::string> formula;//函式
+				for (int i = 1; i < userCommand->Length; ++i) {
+					formula.push_back(context.marshal_as<std::string>(userCommand[i]));
+				}
+
+				Flink * HEAD;
+				Flink * Cur;
+				try {
+					//把函式轉換成後序式
+					Infix2Postfix(formula);
+					
+					//轉換成Token Chain
+					int length = 0;
+					for (auto i = formula.begin(); i != formula.end(); ++i,++length) {
+						if (length == 0) {
+							HEAD = new Flink;
+							Cur = HEAD;
+						}
+						else {
+							Cur->next = new Flink;
+							Cur->next->prev = Cur;
+							Cur = Cur->next;
+						}
+						
+						if (VectorOps.count(*i) == 0) {
+							if (vectors.count(*i) == 0) {
+								std::string msg = "no such instance" + *i;
+								throw std::exception(msg.c_str(), -1);
+							}
+							Cur->type = Flink_e::vector;
+							Cur->value.vec = new Vector(vectors[*i]);
+						}
+						else {
+							Cur->type = Flink_e::op;
+							Cur->value.op = new std::string(*i);
+						}
+					}
+
+					//執行每個Op，將計算結果加入Chain中
+					while (length >1) {
+						Cur = HEAD;
+						while (Cur->type != Flink_e::op) {
+							if (Cur == nullptr)throw std::exception("Error, Incorrect Formula", -1);
+							Cur = Cur->next;
+						}
+						Flink * v2 = Cur->prev;
+						Flink * v1 = v2->prev;
+						Flink * vRet = new Flink;
+						vRet->value.vec = new Vector(std::move(VectorOps[*(Cur->value.op)].two(*v1->value.vec, *v2->value.vec)));
+						//setup
+						vRet->type = Flink_e::vector;
+						vRet->next = Cur->next;
+						if(vRet->next != nullptr) vRet->next->prev = vRet;
+						if (v1 == HEAD) HEAD = vRet;
+						else {
+							vRet->prev = v1->prev;
+							vRet->prev->next = vRet;
+						}
+						//cleanup
+						delete v1;
+						delete v2;
+						delete Cur;
+						length -= 2;
+					}
+
+					//紀錄
+					Output->Text += "result = [ ";
+					for(auto i = HEAD->value.vec->Data.begin(), j = HEAD->value.vec->Data.end() ;  i != j ; ++i){
+						Output->Text += (*i).ToString() + " ";
+					}
+					Output->Text += "]" + Environment::NewLine;
+
+					//清理
+					Cur = HEAD;
+					for (; length > 0; --length) {
+						HEAD = Cur;
+						Cur = HEAD->next;
+						delete HEAD;
+					}
+				}
+				catch (std::exception& e) {
+					Output->Text += gcnew String(e.what()) + Environment::NewLine;
+				}
+				
+			}
+			else
+			{
+				Output->Text += "-Command not found-" + Environment::NewLine;
+			}
 		}
-		//反之則判斷找不到指令
-		else
-		{
-			Output->Text += "-Command not found-" + Environment::NewLine;
+		//Matrix環境
+		else {
+
 		}
+
 		userInput = "";
 	}
 	else
@@ -339,20 +504,20 @@ private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::Co
 		//將VectorList中項目先做清除
 		VectorList->Items->Clear();	
 		//取得所有向量資料
-		std::vector<Vector> vectors = dataManager->GetVectors();
+		std::map<std::string,Vector>& vectors = dataManager->GetVectors();
 
-		for (unsigned int i = 0; i < vectors.size(); i++)
+		for (auto it = vectors.begin(); it != vectors.end() ; it++)
 		{
 			//將檔案名稱存入暫存
-			std::string tempString = vectors[i].Name;
+			std::string tempString = it->first;
 			//將輸出格式存入暫存
 			tempString += " [";
 			//將輸出資料存入暫存
-			for (unsigned int j = 0; j<vectors[i].Data.size(); j++)
+			for (unsigned int j = 0; j<it->second.Data.size(); j++)
 			{
-				std::string scalarString = std::to_string(vectors[i].Data[j]);
+				std::string scalarString = std::to_string(it->second.Data[j]);
 				tempString += scalarString.substr(0, scalarString.size() - 5);
-				if (j != vectors[i].Data.size() - 1)
+				if (j != it->second.Data.size() - 1)
 					tempString += ",";
 			}
 			//將輸出格式存入暫存
@@ -363,5 +528,16 @@ private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::Co
 		Output->Text += "-Vector datas have been loaded-" + Environment::NewLine;
 	}
 }
+private: System::Void openFileDialog2_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
+	//TODO:LOADMATRIX
+}
+
+
+
+
+
+
+
+
 };
 }

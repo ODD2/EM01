@@ -43,9 +43,8 @@ bool DataManager::LoadVectorData()
 					//定義向量變數名稱，依VectorVariableIndex變數作名稱的控管
 					std::string vectorVariableTemp = "$v" + std::to_string(VectorVariableIndex);
 					//存入向量變數名稱
-					tempVector.Name = vectorVariableTemp;
 					//存入向量
-					Vectors.push_back(tempVector);
+					Vectors[vectorVariableTemp] = tempVector;
 					//遞增VectorVariableIndex，以確保變數名稱不重複
 					VectorVariableIndex++;
 					//清除向量資料暫存
@@ -70,20 +69,75 @@ bool DataManager::LoadVectorData()
 		Vector tempVector;
 		tempVector.Data = tempVectorData;
 		std::string vectorVariableTemp = "$v" + std::to_string(VectorVariableIndex);
-		tempVector.Name = vectorVariableTemp;
-		Vectors.push_back(tempVector);
+		Vectors[vectorVariableTemp] = tempVector;
 		VectorVariableIndex++;
 		//讀取成功回傳false
 		return true;
 	}
 }
 
-std::vector<Vector> DataManager::GetVectors()
+std::map<std::string,Vector>& DataManager::GetVectors()
 {
 	return Vectors;
 }
+
 void DataManager::SetFileName(std::string fileName)
 {
 	FileName = fileName;
+}
+
+int priority(std::string in) {
+	if (in == "+" || in == "-") {
+		return 1;
+	}
+	else if (in == "*" || in == "/") {
+		return 2;
+	}
+	else {
+		//TODO:Error Detection
+		return 0;
+	}
+}
+
+void Infix2Postfix(std::vector<std::string>& fx) {
+	try {
+		std::vector<std::string> stack;
+		std::vector<std::string> postfix;
+		for (int i = 0, j = 0; i < fx.size(); i++)
+		{
+			std::string cur = fx[i];
+			if (cur == "(") {
+				stack.push_back(fx[i]);
+			}
+			else if (cur == "+" || cur == "-" || cur == "*" || cur == "/") {
+				while (stack.size() > 0 && priority(stack.back()) > priority(cur)) {
+					postfix.push_back(stack.back());
+					stack.pop_back();
+				}
+				stack.push_back(cur);
+			}
+			else if (cur == ")") {
+				while (stack.back() != "(")
+				{
+					postfix.push_back(stack.back());
+					stack.pop_back();
+				}
+				stack.pop_back();
+			}
+			else {
+				postfix.push_back(cur);
+			}
+		}
+		while (stack.size()) {
+			if (stack.back() == "(") throw std::exception("Lexical Error", -1);
+			//TODO: Error Detection.
+			postfix.push_back(stack.back());
+			stack.pop_back();
+		}
+		fx = postfix;
+	}
+	catch (std::exception& e) {
+		throw e;
+	}
 }
 

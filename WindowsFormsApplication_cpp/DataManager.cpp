@@ -26,6 +26,7 @@ bool DataManager::LoadVectorData()
 		//從檔案讀取字串，解析掉向量總數
 		fin >> tempSring;
 		
+		ResetVectorData();
 		//執行讀檔迴圈，並在讀到檔案結尾時結束
 		while (!fin.eof())
 		{

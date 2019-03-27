@@ -23,6 +23,10 @@ public:
 	DataManager();
 	//讀取向量資料
 	bool LoadVectorData();
+	void ResetVectorData() {
+		VectorVariableIndex = 0; 
+		Vectors.clear();
+	}
 	//取得向量資料
 	std::map<std::string, Vector>& GetVectors();
 	//設置檔案路徑名稱

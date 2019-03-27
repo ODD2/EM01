@@ -121,7 +121,7 @@ namespace WindowsFormsApplication_cpp {
 			this->menuStrip2->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->FileToolStripMenuItem });
 			this->menuStrip2->Location = System::Drawing::Point(0, 0);
 			this->menuStrip2->Name = L"menuStrip2";
-			this->menuStrip2->Size = System::Drawing::Size(384, 24);
+			this->menuStrip2->Size = System::Drawing::Size(657, 24);
 			this->menuStrip2->TabIndex = 1;
 			this->menuStrip2->Text = L"menuStrip2";
 			// 
@@ -138,14 +138,14 @@ namespace WindowsFormsApplication_cpp {
 			// LoadVectorToolStripMenuItem
 			// 
 			this->LoadVectorToolStripMenuItem->Name = L"LoadVectorToolStripMenuItem";
-			this->LoadVectorToolStripMenuItem->Size = System::Drawing::Size(180, 22);
+			this->LoadVectorToolStripMenuItem->Size = System::Drawing::Size(143, 22);
 			this->LoadVectorToolStripMenuItem->Text = L"Load Vector";
 			this->LoadVectorToolStripMenuItem->Click += gcnew System::EventHandler(this, &WindowsForm::LoadVectorToolStripMenuItem_Click);
 			// 
 			// LoadMatrixToolStripMenuItem
 			// 
 			this->LoadMatrixToolStripMenuItem->Name = L"LoadMatrixToolStripMenuItem";
-			this->LoadMatrixToolStripMenuItem->Size = System::Drawing::Size(180, 22);
+			this->LoadMatrixToolStripMenuItem->Size = System::Drawing::Size(143, 22);
 			this->LoadMatrixToolStripMenuItem->Text = L"Load Matrix";
 			this->LoadMatrixToolStripMenuItem->Click += gcnew System::EventHandler(this, &WindowsForm::LoadMatrixToolStripMenuItem_Click);
 			// 
@@ -153,9 +153,9 @@ namespace WindowsFormsApplication_cpp {
 			// 
 			this->tableLayoutPanel1->ColumnCount = 2;
 			this->tableLayoutPanel1->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
-				50)));
+				59.59752F)));
 			this->tableLayoutPanel1->ColumnStyles->Add((gcnew System::Windows::Forms::ColumnStyle(System::Windows::Forms::SizeType::Percent,
-				50)));
+				40.40248F)));
 			this->tableLayoutPanel1->Controls->Add(this->flowLayoutPanel1, 1, 0);
 			this->tableLayoutPanel1->Controls->Add(this->flowLayoutPanel2, 0, 0);
 			this->tableLayoutPanel1->Dock = System::Windows::Forms::DockStyle::Fill;
@@ -164,7 +164,7 @@ namespace WindowsFormsApplication_cpp {
 			this->tableLayoutPanel1->RowCount = 1;
 			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 100)));
 			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 20)));
-			this->tableLayoutPanel1->Size = System::Drawing::Size(384, 338);
+			this->tableLayoutPanel1->Size = System::Drawing::Size(657, 482);
 			this->tableLayoutPanel1->TabIndex = 2;
 			// 
 			// flowLayoutPanel1
@@ -173,9 +173,9 @@ namespace WindowsFormsApplication_cpp {
 			this->flowLayoutPanel1->Controls->Add(this->Input);
 			this->flowLayoutPanel1->Controls->Add(this->VectorLabel);
 			this->flowLayoutPanel1->Controls->Add(this->VectorList);
-			this->flowLayoutPanel1->Location = System::Drawing::Point(195, 3);
+			this->flowLayoutPanel1->Location = System::Drawing::Point(394, 3);
 			this->flowLayoutPanel1->Name = L"flowLayoutPanel1";
-			this->flowLayoutPanel1->Size = System::Drawing::Size(186, 332);
+			this->flowLayoutPanel1->Size = System::Drawing::Size(260, 474);
 			this->flowLayoutPanel1->TabIndex = 0;
 			// 
 			// InputLabel
@@ -195,7 +195,7 @@ namespace WindowsFormsApplication_cpp {
 			this->Input->Location = System::Drawing::Point(3, 19);
 			this->Input->Multiline = true;
 			this->Input->Name = L"Input";
-			this->Input->Size = System::Drawing::Size(180, 158);
+			this->Input->Size = System::Drawing::Size(254, 167);
 			this->Input->TabIndex = 1;
 			this->Input->TextChanged += gcnew System::EventHandler(this, &WindowsForm::Input_TextChanged);
 			// 
@@ -205,7 +205,7 @@ namespace WindowsFormsApplication_cpp {
 			this->VectorLabel->AutoSize = true;
 			this->VectorLabel->Font = (gcnew System::Drawing::Font(L"微軟正黑體", 9, static_cast<System::Drawing::FontStyle>((System::Drawing::FontStyle::Bold | System::Drawing::FontStyle::Italic)),
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(136)));
-			this->VectorLabel->Location = System::Drawing::Point(3, 180);
+			this->VectorLabel->Location = System::Drawing::Point(3, 189);
 			this->VectorLabel->Name = L"VectorLabel";
 			this->VectorLabel->Size = System::Drawing::Size(47, 16);
 			this->VectorLabel->TabIndex = 2;
@@ -215,9 +215,9 @@ namespace WindowsFormsApplication_cpp {
 			// 
 			this->VectorList->FormattingEnabled = true;
 			this->VectorList->ItemHeight = 12;
-			this->VectorList->Location = System::Drawing::Point(3, 199);
+			this->VectorList->Location = System::Drawing::Point(3, 208);
 			this->VectorList->Name = L"VectorList";
-			this->VectorList->Size = System::Drawing::Size(180, 124);
+			this->VectorList->Size = System::Drawing::Size(254, 256);
 			this->VectorList->TabIndex = 3;
 			// 
 			// flowLayoutPanel2
@@ -226,7 +226,7 @@ namespace WindowsFormsApplication_cpp {
 			this->flowLayoutPanel2->Controls->Add(this->Output);
 			this->flowLayoutPanel2->Location = System::Drawing::Point(3, 3);
 			this->flowLayoutPanel2->Name = L"flowLayoutPanel2";
-			this->flowLayoutPanel2->Size = System::Drawing::Size(186, 332);
+			this->flowLayoutPanel2->Size = System::Drawing::Size(385, 476);
 			this->flowLayoutPanel2->TabIndex = 1;
 			// 
 			// OutputLabel
@@ -249,8 +249,10 @@ namespace WindowsFormsApplication_cpp {
 			this->Output->Multiline = true;
 			this->Output->Name = L"Output";
 			this->Output->ReadOnly = true;
-			this->Output->Size = System::Drawing::Size(183, 313);
+			this->Output->ScrollBars = System::Windows::Forms::ScrollBars::Both;
+			this->Output->Size = System::Drawing::Size(375, 455);
 			this->Output->TabIndex = 1;
+			this->Output->WordWrap = false;
 			// 
 			// openFileDialog1
 			// 
@@ -266,7 +268,7 @@ namespace WindowsFormsApplication_cpp {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(384, 362);
+			this->ClientSize = System::Drawing::Size(657, 506);
 			this->Controls->Add(this->tableLayoutPanel1);
 			this->Controls->Add(this->menuStrip2);
 			this->Name = L"WindowsForm";
@@ -312,166 +314,357 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 		//Vector環境
 		if (contextOP == 0) {
 			//字串比較，若指令為"print"的情況
-			if (userCommand[0] == "Print")
-			{
-				//定意輸出暫存
-				String^ outputTemp = "";
-				std::string vname = context.marshal_as<std::string>(userCommand[1]);
-				//若變數名稱與指令變數名稱符合
-				if (vectors.count(vname))
+			try {
+				if (userCommand[0] == "Print")
 				{
-					Vector& target = vectors[vname];
-					//將輸出格式存入暫存
-					outputTemp += "[";
-					//將輸出資料存入暫存
-					for (unsigned int j = 0; j < target.Data.size(); j++)
+					//定意輸出暫存
+					String^ outputTemp = "";
+					std::string vname = context.marshal_as<std::string>(userCommand[1]);
+					//若變數名稱與指令變數名稱符合
+					if (vectors.count(vname))
 					{
-						outputTemp += target.Data[j].ToString();
-						if (j != target.Data.size() - 1)
-							outputTemp += ",";
+						Vector& target = vectors[vname];
+						//將輸出格式存入暫存
+						outputTemp += "[";
+						//將輸出資料存入暫存
+						for (unsigned int j = 0; j < target.Data.size(); j++)
+						{
+							outputTemp += target.Data[j].ToString();
+							if (j != target.Data.size() - 1)
+								outputTemp += ",";
+						}
+						//將輸出格式存入暫存，並且換行
+						outputTemp += "]" + Environment::NewLine;
+						//輸出暫存資訊
+						Output->Text += userCommand[1] + " = " + outputTemp;
 					}
-					//將輸出格式存入暫存，並且換行
-					outputTemp += "]" + Environment::NewLine;
-					//輸出暫存資訊
-					Output->Text += userCommand[1] + " = " + outputTemp;
 				}
-			}
-			else if (userCommand[0] == "Norm") {
+				else if (userCommand[0] == "Norm") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					//std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						double val = length(vectors[left_v])[0];
+						Output->Text += "Norm(" + userCommand[1] + ") = " + val.ToString() + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "Normal") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Vector vec = nrmlz(vectors[left_v]);
+						Output->Text += "Normal(" + userCommand[1] + ") = [ ";
+						for (int i = 0; i < vec.dim(); i++) {
+							Output->Text += vec[i].ToString() + " ";
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "Cross") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (userCommand->Length != 3) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else if (vectors.count(right_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Vector vec = cross(vectors[left_v], vectors[right_v]);
+						Output->Text += "Cross(" + userCommand[1] + "," + userCommand[2] + ") = [ ";
+						for (int i = 0; i < vec.dim(); i++) {
+							Output->Text += vec[i].ToString() + " ";
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "Com") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (userCommand->Length != 3) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else if (vectors.count(right_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Vector vec = comp(vectors[left_v], vectors[right_v]);
+						Output->Text += "Comp(" + userCommand[1] + "," + userCommand[2] + ") = [ ";
+						for (int i = 0; i < vec.dim(); i++) {
+							Output->Text += vec[i].ToString() + " ";
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "Proj") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (userCommand->Length != 3) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else if (vectors.count(right_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Vector vec = proj(vectors[left_v], vectors[right_v]);
+						Output->Text += "Proj(" + userCommand[1] + "," + userCommand[2] + ") = [ ";
+						for (int i = 0; i < vec.dim(); i++) {
+							Output->Text += vec[i].ToString() + " ";
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "Area") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (userCommand->Length != 3) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else if (vectors.count(right_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Vector vec = triangle(vectors[left_v], vectors[right_v]);
+						Output->Text += "Area(" + userCommand[1] + "," + userCommand[2] + ") = [ ";
+						for (int i = 0; i < vec.dim(); i++) {
+							Output->Text += vec[i].ToString() + " ";
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "isParallel") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (userCommand->Length != 3) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else if (vectors.count(right_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+					}
+					else {
+						bool ans = parallel(vectors[left_v], vectors[right_v]);
+						Output->Text += "isParallel(" + userCommand[1] + "," + userCommand[2] + ") = " + (ans ? "Yes" : "No") + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "isOrthogonal") {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (userCommand->Length != 3) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else if (vectors.count(left_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else if (vectors.count(right_v) == 0) {
+						Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+					}
+					else {
+						bool ans = orthogonal(vectors[left_v], vectors[right_v]);
+						Output->Text += "isOrthogonal(" + userCommand[1] + "," + userCommand[2] + ") = " + (ans ? "Yes" : "No") + Environment::NewLine;
+					}
+				}
+				else if (userCommand[0] == "angle") {
 				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
-				//std::string right_v = context.marshal_as<std::string>(userCommand[2]);
-				if (vectors.count(left_v) == 0) {
+				std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+				if (userCommand->Length != 3) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else if (vectors.count(left_v) == 0) {
 					Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
 				}
-				else {
-					double val = length(vectors[left_v])[0];
-					Output->Text += "Norm(" + userCommand[1] + ") = " + val.ToString() + Environment::NewLine;
-				}
-			}
-			else if (userCommand[0] == "Normal") {
-				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
-				if (vectors.count(left_v) == 0) {
-					Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+				else if (vectors.count(right_v) == 0) {
+					Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
 				}
 				else {
-					Vector vec = nrmlz(vectors[left_v]);
-					Output->Text += "Normal(" + userCommand[1] + ") = [ ";
+					Vector vec = angle(vectors[left_v], vectors[right_v]);
+					Output->Text += "angle(" + userCommand[1] + "," + userCommand[2] + ") = [ ";
 					for (int i = 0; i < vec.dim(); i++) {
 						Output->Text += vec[i].ToString() + " ";
 					}
-					Output->Text += "]"+ Environment::NewLine;
+					Output->Text += "]" + Environment::NewLine;
 				}
-			}
-			else if (userCommand[0] == "Cross") {
-
-			}
-			else if (userCommand[0] == "Com") {
-
-			}
-			else if (userCommand[0] == "Proj") {
-
-			}
-			else if (userCommand[0] == "Area") {
-
-			}
-			else if (userCommand[0] == "isParallel") {
-
-			}
-			else if (userCommand[0] == "isOrthogonal") {
-
-			}
-			else if (userCommand[0] == "angle") {
-
-			}
-			else if (userCommand[0] == "Calc") {
-				
-				std::vector<std::string> formula;//函式
-				for (int i = 1; i < userCommand->Length; ++i) {
-					formula.push_back(context.marshal_as<std::string>(userCommand[i]));
 				}
-
-				Flink * HEAD;
-				Flink * Cur;
-				try {
-					//把函式轉換成後序式
-					Infix2Postfix(formula);
-					
-					//轉換成Token Chain
-					int length = 0;
-					for (auto i = formula.begin(); i != formula.end(); ++i,++length) {
-						if (length == 0) {
-							HEAD = new Flink;
-							Cur = HEAD;
-						}
-						else {
-							Cur->next = new Flink;
-							Cur->next->prev = Cur;
-							Cur = Cur->next;
-						}
-						
-						if (VectorOps.count(*i) == 0) {
-							if (vectors.count(*i) == 0) {
-								std::string msg = "no such instance" + *i;
-								throw std::exception(msg.c_str(), -1);
-							}
-							Cur->type = Flink_e::vector;
-							Cur->value.vec = new Vector(vectors[*i]);
-						}
-						else {
-							Cur->type = Flink_e::op;
-							Cur->value.op = new std::string(*i);
-						}
-					}
-
-					//執行每個Op，將計算結果加入Chain中
-					while (length >1) {
-						Cur = HEAD;
-						while (Cur->type != Flink_e::op) {
-							if (Cur == nullptr)throw std::exception("Error, Incorrect Formula", -1);
-							Cur = Cur->next;
-						}
-						Flink * v2 = Cur->prev;
-						Flink * v1 = v2->prev;
-						Flink * vRet = new Flink;
-						vRet->value.vec = new Vector(std::move(VectorOps[*(Cur->value.op)].two(*v1->value.vec, *v2->value.vec)));
-						//setup
-						vRet->type = Flink_e::vector;
-						vRet->next = Cur->next;
-						if(vRet->next != nullptr) vRet->next->prev = vRet;
-						if (v1 == HEAD) HEAD = vRet;
-						else {
-							vRet->prev = v1->prev;
-							vRet->prev->next = vRet;
-						}
-						//cleanup
-						delete v1;
-						delete v2;
-						delete Cur;
-						length -= 2;
-					}
-
-					//紀錄
-					Output->Text += "result = [ ";
-					for(auto i = HEAD->value.vec->Data.begin(), j = HEAD->value.vec->Data.end() ;  i != j ; ++i){
-						Output->Text += (*i).ToString() + " ";
+				else if (userCommand[0] == "pN") {
+				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+				std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+				if (userCommand->Length != 3) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else if (vectors.count(left_v) == 0) {
+					Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+				}
+				else if (vectors.count(right_v) == 0) {
+					Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+				}
+				else {
+					Vector vec = planeNormal(vectors[left_v], vectors[right_v]);
+					Output->Text += "pN(" + userCommand[1] + "," + userCommand[2] + ") = [ ";
+					for (int i = 0; i < vec.dim(); i++) {
+						Output->Text += vec[i].ToString() + " ";
 					}
 					Output->Text += "]" + Environment::NewLine;
-
-					//清理
-					Cur = HEAD;
-					for (; length > 0; --length) {
-						HEAD = Cur;
-						Cur = HEAD->next;
-						delete HEAD;
 					}
 				}
-				catch (std::exception& e) {
-					Output->Text += gcnew String(e.what()) + Environment::NewLine;
+				else if (userCommand[0] == "IsLI") {
+				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+				std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+				if (userCommand->Length != 3) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
 				}
-				
+				else if (vectors.count(left_v) == 0) {
+					Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
+				}
+				else if (vectors.count(right_v) == 0) {
+					Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+				}
+				else {
+					bool ans = independent(vectors[left_v], vectors[right_v]);
+					Output->Text += "IsLI(" + userCommand[1] + "," + userCommand[2] + ") = " + (ans ? "Yes" :"No") + Environment::NewLine;
+				}
+				}
+				else if (userCommand[0] == "Ob") { 
+				std::vector<Vector> ret;
+				bool err = false;
+				for (int i = 1; i < userCommand->Length; ++i) {
+					std::string _v = context.marshal_as<std::string>(userCommand[i]);
+					if (!vectors.count(_v)) {
+						Output->Text += "Error, vector " + userCommand[i] + " undefined." + Environment::NewLine;
+						err = true; break;
+					}
+					else {
+						ret.push_back(vectors[_v]);
+					}
+				}
+				if (!err) {
+					ret = gram_schmidt(ret);
+					Output->Text += "Ob(" + userCommand[1];
+					for (int i = 2; i < userCommand->Length; ++i) {
+						Output->Text += "," + userCommand[i];
+					}
+					Output->Text += ") = " + Environment::NewLine;
+					Output->Text += "normal " + ret[0].dim().ToString() + Environment::NewLine;
+					for (int i = 0, j = ret[0].dim(); i < j; ++i) {
+						Output->Text += "[ ";
+						for (int k = 0; k < j; ++k) {
+							Output->Text += ret[i][k].ToString() + " ";
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				}
+				else if (userCommand[0] == "Calc") {
+
+					std::vector<std::string> formula;//函式
+					for (int i = 1; i < userCommand->Length; ++i) {
+						formula.push_back(context.marshal_as<std::string>(userCommand[i]));
+					}
+
+					Flink * HEAD;
+					Flink * Cur;
+					try {
+						//把函式轉換成後序式
+						Infix2Postfix(formula);
+
+						//轉換成Token Chain
+						int length = 0;
+						for (auto i = formula.begin(); i != formula.end(); ++i, ++length) {
+							if (length == 0) {
+								HEAD = new Flink;
+								Cur = HEAD;
+							}
+							else {
+								Cur->next = new Flink;
+								Cur->next->prev = Cur;
+								Cur = Cur->next;
+							}
+
+							if (VectorOps.count(*i) == 0) {
+								if (vectors.count(*i) == 0) {
+									std::string msg = "no such instance" + *i;
+									throw std::exception(msg.c_str(), -1);
+								}
+								Cur->type = Flink_e::vector;
+								Cur->value.vec = new Vector(vectors[*i]);
+							}
+							else {
+								Cur->type = Flink_e::op;
+								Cur->value.op = new std::string(*i);
+							}
+						}
+
+						//執行每個Op，將計算結果加入Chain中
+						while (length > 1) {
+							Cur = HEAD;
+							while (Cur->type != Flink_e::op) {
+								if (Cur == nullptr)throw std::exception("Error, Incorrect Formula", -1);
+								Cur = Cur->next;
+							}
+							Flink * v2 = Cur->prev;
+							Flink * v1 = v2->prev;
+							Flink * vRet = new Flink;
+							vRet->value.vec = new Vector(std::move(VectorOps[*(Cur->value.op)].two(*v1->value.vec, *v2->value.vec)));
+							//setup
+							vRet->type = Flink_e::vector;
+							vRet->next = Cur->next;
+							if (vRet->next != nullptr) vRet->next->prev = vRet;
+							if (v1 == HEAD) HEAD = vRet;
+							else {
+								vRet->prev = v1->prev;
+								vRet->prev->next = vRet;
+							}
+							//cleanup
+							delete v1;
+							delete v2;
+							delete Cur;
+							length -= 2;
+						}
+
+						//紀錄
+						Output->Text += "result = [ ";
+						for (auto i = HEAD->value.vec->Data.begin(), j = HEAD->value.vec->Data.end(); i != j; ++i) {
+							Output->Text += (*i).ToString() + " ";
+						}
+						Output->Text += "]" + Environment::NewLine;
+
+						//清理
+						Cur = HEAD;
+						for (; length > 0; --length) {
+							HEAD = Cur;
+							Cur = HEAD->next;
+							delete HEAD;
+						}
+					}
+					catch (std::exception& e) {
+						Output->Text += gcnew String(e.what()) + Environment::NewLine;
+					}
+
+				}
+				else
+				{
+					Output->Text += "-Command not found-" + Environment::NewLine;
+				}
 			}
-			else
-			{
-				Output->Text += "-Command not found-" + Environment::NewLine;
+			catch (std::exception&e) {
+				Output->Text += gcnew String(e.what()) + Environment::NewLine;
 			}
 		}
 		//Matrix環境

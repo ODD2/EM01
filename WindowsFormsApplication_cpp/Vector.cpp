@@ -1,6 +1,8 @@
 #include "Vector.h"
+#include <stdarg.h>
 #include <exception>
-
+#include <math.h>
+#define DIM_ERR throw std::exception("Vector Dimension Error", -1);
 
 
 //The Addition of Vector
@@ -43,8 +45,38 @@ Vector mult(const Vector& l, const Vector& r) throw(std::exception){
 	}
 }
 
+//The Crossproduct of Vector
+Vector cross(const Vector&l, const Vector &r) throw(std::exception) {
+	if (l.dim() == 3 && r.dim() == 3) {
+		Vector ret(3);
+		ret[2] = l[0] * r[1] - r[0]*l[1];
+		ret[0] = l[1] * r[2] - r[1] * l[2];
+		ret[1] = l[2] * r[0] - r[2] * l[0];
+		return ret;
+	}
+	else {
+		DIM_ERR
+	}
+}
 
 //Vector dot(const Vector& l, const Vector& r);
+
+Vector comp(const Vector&l, const Vector&r) {
+	Vector cross_r =  mult(l,r);
+	Vector b_leng = length(r);
+	b_leng[0] = 1 / b_leng[0];
+	return mult(b_leng, cross_r);
+}
+
+Vector proj(const Vector&l, const Vector&r) {
+	return mult(comp(l, r), nrmlz(r));
+}
+
+Vector triangle(const Vector &l, const Vector &r) {
+	Vector half(1);
+	half[0] = 0.5;
+	return mult(half, length(cross(l, r)));
+}
 
 //The Magnitude of a Vector
 Vector length(const Vector& target) {
@@ -63,6 +95,96 @@ Vector nrmlz(const Vector &r) {
 	Vector ret = r;
 	for (int i = 0, j = ret.dim(); i < j; ++i) {
 		ret[i] /= scaler;
+	}
+	return ret;
+}
+
+Vector angle(const Vector &l, const Vector &r) {
+	if (l.dim() == 3 && r.dim() == 3) {
+		Vector ret(1);
+		ret[0] = std::acos(mult(l, r)[0] / (length(l)[0] * length(r)[0])) / 3.1415925 * 180;
+
+		return ret;
+	}
+	else
+		DIM_ERR
+}
+
+Vector planeNormal(const Vector &l, const Vector &r) {
+	return nrmlz(cross(l, r));
+}
+
+bool parallel(const Vector &l,const Vector &r) {
+	if (l.dim() != r.dim()) {
+		DIM_ERR;
+	}
+	else {
+		double compare = length(l)[0] * length(r)[0];
+		if (compare == abs(mult(l,r)[0]))return true;
+		else return false;
+	}
+}
+
+bool orthogonal(const Vector &l, const Vector &r) {
+	if (l.dim() == 3 && r.dim() == 3) {
+		Vector Dot_r = mult(l, r);
+		for (int i = 0; i < 3; ++i) {
+			if (Dot_r[i] != 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	//else if (l.dim()==7 && r.dim()==7){
+	//}
+	else 
+		DIM_ERR
+}
+
+bool independent(const Vector &l, const Vector &r) {
+	if (parallel(l, r)) {
+		return true;
+	}
+	return false;
+}
+
+std::vector<Vector> gram_schmidt(std::vector<Vector> ret) {
+	ret[0] = nrmlz(ret[0]);
+	int dim = ret[0].dim();
+	if (ret.size() < dim) {
+		throw std::exception("Insufficient Vector", -1);
+	}
+	for (int i = 1; i < ret.size(); i++) {
+		if (ret[i].dim() != dim) {
+			DIM_ERR
+		}
+	}
+	for (int i = 1; i < dim; ++i) {
+		for (int j = 0; j < i; ++j) {
+			Vector dot_r = mult(ret[i], ret[j]); dot_r[0] *= -1;
+			ret[i] = add(ret[i], mult(dot_r, ret[j]));
+		}
+		ret[i] = nrmlz(ret[i]);
+	}
+	return ret;
+}
+std::vector<Vector> gram_schmidt(Vector l, ...) {
+	va_list ap;
+	va_start(ap, l);
+	std::vector<Vector> ret(1); 	ret[0] = nrmlz(l);
+	int dim = ret[0].dim();
+	for (int i = 1; i < dim ; i++) {
+		ret.push_back(va_arg(ap, Vector));
+		if (ret.back().dim() != dim) {
+			DIM_ERR
+		}
+	}
+	for (int i = 1; i < dim; ++i) {
+		for (int j = 0; j < i; ++j) {
+			Vector dot_r = mult(ret[i], ret[j]); dot_r[0] *= -1;
+			ret[i] = add(ret[i], mult(dot_r, ret[j]));
+		}
+		ret[i] = nrmlz(ret[i]);
 	}
 	return ret;
 }

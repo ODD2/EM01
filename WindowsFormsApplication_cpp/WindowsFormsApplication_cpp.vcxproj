@@ -139,6 +139,7 @@
     <ClCompile Include="DataManager.cpp" />
     <ClCompile Include="DotNetUitilities.cpp" />
     <ClCompile Include="Flink.cpp" />
+    <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="WindowsForm.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="DataManager.h" />
     <ClInclude Include="DotNetUtilities.h" />
     <ClInclude Include="Flink.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="WindowsForm.h">
       <FileType>CppForm</FileType>

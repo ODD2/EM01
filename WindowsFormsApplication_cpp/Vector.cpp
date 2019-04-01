@@ -100,7 +100,7 @@ Vector nrmlz(const Vector &r) {
 }
 
 Vector angle(const Vector &l, const Vector &r) {
-	if (l.dim() == 3 && r.dim() == 3) {
+	if (l.dim() != r.dim()) {
 		Vector ret(1);
 		ret[0] = std::acos(mult(l, r)[0] / (length(l)[0] * length(r)[0])) / 3.1415925 * 180;
 
@@ -118,20 +118,20 @@ bool parallel(const Vector &l,const Vector &r) {
 	if (l.dim() != r.dim()) {
 		DIM_ERR;
 	}
-	else {
-		double compare = length(l)[0] * length(r)[0];
+	else{
+		double ll = length(l)[0], lr = length(r)[0];
+		if (ll == 0 || lr == 0) return false;
+		double compare =ll * lr;
 		if (compare == abs(mult(l,r)[0]))return true;
 		else return false;
 	}
 }
 
 bool orthogonal(const Vector &l, const Vector &r) {
-	if (l.dim() == 3 && r.dim() == 3) {
+	if (l.dim() == r.dim()) {
 		Vector Dot_r = mult(l, r);
-		for (int i = 0; i < 3; ++i) {
-			if (Dot_r[i] != 0) {
-				return false;
-			}
+		if (Dot_r[0] != 0) {
+			return false;
 		}
 		return true;
 	}
@@ -142,7 +142,7 @@ bool orthogonal(const Vector &l, const Vector &r) {
 }
 
 bool independent(const Vector &l, const Vector &r) {
-	if (parallel(l, r)) {
+	if (!parallel(l, r)) {
 		return true;
 	}
 	return false;

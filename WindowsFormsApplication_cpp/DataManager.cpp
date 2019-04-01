@@ -7,9 +7,8 @@ DataManager::DataManager()
 
 bool DataManager::LoadVectorData()
 {
-	std::fstream fin;
 	//開啟檔案，傳入open函數的參數有兩個，欲開起的檔案名稱，開啟檔案的模式參數(這邊std::ios::in為讀取(輸入)狀態)
-	fin.open(FileName, std::ios::in);
+	std::fstream fin(FileName, std::ios::in);
 	//讀取失敗回傳false
 	if (!fin)
 	{
@@ -17,62 +16,61 @@ bool DataManager::LoadVectorData()
 	}
 	else
 	{
-		//標記當前讀取向量ID
-		int currentLoadVectorID = 0;
-		//定義向量資料暫存變數
-		std::vector<double> tempVectorData;
-		//定義讀取檔案字串暫存變數
-		std::string tempSring;
-		//從檔案讀取字串，解析掉向量總數
-		fin >> tempSring;
-		
 		ResetVectorData();
-		//執行讀檔迴圈，並在讀到檔案結尾時結束
-		while (!fin.eof())
-		{
-			//從檔案讀取字串
-			fin >> tempSring;
-			//解析到向量標記"V"
-			if (tempSring == "V")
-			{
-				if (currentLoadVectorID != 0)
-				{
-					//定義暫存向量資料結構
-					Vector tempVector;
-					//存入向量資料
-					tempVector.Data = tempVectorData;
-					//定義向量變數名稱，依VectorVariableIndex變數作名稱的控管
-					std::string vectorVariableTemp = "$v" + std::to_string(VectorVariableIndex);
-					//存入向量變數名稱
-					//存入向量
-					Vectors[vectorVariableTemp] = tempVector;
-					//遞增VectorVariableIndex，以確保變數名稱不重複
-					VectorVariableIndex++;
-					//清除向量資料暫存
-					tempVectorData.clear();
-				}
-				//遞增currentLoadVectorID，標記到當前讀取向量ID
-				currentLoadVectorID++;
-				//從檔案讀取字串，解析掉向量維度
-				fin >> tempSring;
+		int num_vectors = 0, entities = 0;
+		char type = ' ';
+		fin >> num_vectors;
+		for (int i = 0; i < num_vectors; ++i) {
+			fin >> type >> entities;
+			if (type != 'V') {
+				ResetVectorData();
+				return false;
 			}
-			else
-			{
-				//讀取向量資料，並將string轉為double
-				double value;
-				value = (double)strtod(tempSring.c_str(), NULL);
-				//將向量資料存入暫存
-				tempVectorData.push_back(value);
+			std::string name = "$v" + std::to_string(i);
+			Vectors[name] = Vector(entities);
+			Vector & target = Vectors[name];
+			for (int e = 0; e < entities; ++e) {
+					if (!(fin >> target[e])) {
+						return false;
+					}
 			}
-			
 		}
-		//讀入輸入檔案中最後一個向量資訊
-		Vector tempVector;
-		tempVector.Data = tempVectorData;
-		std::string vectorVariableTemp = "$v" + std::to_string(VectorVariableIndex);
-		Vectors[vectorVariableTemp] = tempVector;
-		VectorVariableIndex++;
-		//讀取成功回傳false
+		return true;
+	}
+}
+
+bool DataManager::LoadMatrixData()
+{
+	//開啟檔案，傳入open函數的參數有兩個，欲開起的檔案名稱，開啟檔案的模式參數(這邊std::ios::in為讀取(輸入)狀態)
+	std::fstream fin(FileName,std::ios::in);
+	//讀取失敗回傳false
+	if (!fin)
+	{
+		return false;
+	}
+	else
+	{
+		ResetMatrixData();
+		int num_matrices = 0, rows = 0, cols = 0;
+		char type = ' ';
+		fin >> num_matrices;
+		for (int i = 0; i < num_matrices; ++i) {
+			fin >> type >> rows >> cols;
+			if (type != 'M') {
+				ResetMatrixData();
+				return false;
+			}
+			std::string name = "$m" + std::to_string(i);
+			Matrices[name] = Matrix(rows, cols);
+			Matrix & target = Matrices[name];
+			for (int r = 0; r < rows; ++r) {
+				for (int c = 0; c < cols; ++c) {
+					if (!(fin >> target[r][c])) {
+						return false;
+					}
+				}
+			}
+		}
 		return true;
 	}
 }

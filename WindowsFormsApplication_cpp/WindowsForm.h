@@ -53,7 +53,8 @@ namespace WindowsFormsApplication_cpp {
 	private: System::Windows::Forms::Label^  InputLabel;
 	private: System::Windows::Forms::TextBox^  Input;
 	private: System::Windows::Forms::Label^  VectorLabel;
-	private: System::Windows::Forms::ListBox^  VectorList;
+	private: System::Windows::Forms::ListBox^  VariableList;
+
 
 
 
@@ -104,7 +105,7 @@ namespace WindowsFormsApplication_cpp {
 			this->InputLabel = (gcnew System::Windows::Forms::Label());
 			this->Input = (gcnew System::Windows::Forms::TextBox());
 			this->VectorLabel = (gcnew System::Windows::Forms::Label());
-			this->VectorList = (gcnew System::Windows::Forms::ListBox());
+			this->VariableList = (gcnew System::Windows::Forms::ListBox());
 			this->flowLayoutPanel2 = (gcnew System::Windows::Forms::FlowLayoutPanel());
 			this->OutputLabel = (gcnew System::Windows::Forms::Label());
 			this->Output = (gcnew System::Windows::Forms::TextBox());
@@ -172,7 +173,7 @@ namespace WindowsFormsApplication_cpp {
 			this->flowLayoutPanel1->Controls->Add(this->InputLabel);
 			this->flowLayoutPanel1->Controls->Add(this->Input);
 			this->flowLayoutPanel1->Controls->Add(this->VectorLabel);
-			this->flowLayoutPanel1->Controls->Add(this->VectorList);
+			this->flowLayoutPanel1->Controls->Add(this->VariableList);
 			this->flowLayoutPanel1->Location = System::Drawing::Point(394, 3);
 			this->flowLayoutPanel1->Name = L"flowLayoutPanel1";
 			this->flowLayoutPanel1->Size = System::Drawing::Size(260, 474);
@@ -211,14 +212,15 @@ namespace WindowsFormsApplication_cpp {
 			this->VectorLabel->TabIndex = 2;
 			this->VectorLabel->Text = L"Vector";
 			// 
-			// VectorList
+			// VariableList
 			// 
-			this->VectorList->FormattingEnabled = true;
-			this->VectorList->ItemHeight = 12;
-			this->VectorList->Location = System::Drawing::Point(3, 208);
-			this->VectorList->Name = L"VectorList";
-			this->VectorList->Size = System::Drawing::Size(254, 256);
-			this->VectorList->TabIndex = 3;
+			this->VariableList->FormattingEnabled = true;
+			this->VariableList->HorizontalScrollbar = true;
+			this->VariableList->ItemHeight = 12;
+			this->VariableList->Location = System::Drawing::Point(3, 208);
+			this->VariableList->Name = L"VariableList";
+			this->VariableList->Size = System::Drawing::Size(254, 256);
+			this->VariableList->TabIndex = 3;
 			// 
 			// flowLayoutPanel2
 			// 
@@ -668,7 +670,7 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 			}
 		}
 		//Matrix環境
-		else {
+		else if(contextOP == 1){
 
 		}
 
@@ -694,8 +696,8 @@ private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::Co
 	//從讀取讀取向量資料
 	if (dataManager->LoadVectorData())
 	{
-		//將VectorList中項目先做清除
-		VectorList->Items->Clear();	
+		//將VariableList中項目先做清除
+		VariableList->Items->Clear();	
 		//取得所有向量資料
 		std::map<std::string,Vector>& vectors = dataManager->GetVectors();
 
@@ -715,14 +717,51 @@ private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::Co
 			}
 			//將輸出格式存入暫存
 			tempString += "]";
-			//將項目加入VectorList中
-			VectorList->Items->Add(gcnew String(tempString.c_str()));
+			//將項目加入VariableList中
+			VariableList->Items->Add(gcnew String(tempString.c_str()));
 		}
+		contextOP = 0;
 		Output->Text += "-Vector datas have been loaded-" + Environment::NewLine;
 	}
 }
 private: System::Void openFileDialog2_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
-	//TODO:LOADMATRIX
+	//在Dialog按下OK便會進入此函式
+	//字串轉制string^ to string
+	std::string tempFileName;
+	MarshalString(openFileDialog2->FileName, tempFileName);
+	//將檔案路徑名稱傳入dataManager
+	dataManager->SetFileName(tempFileName);
+	//從讀取讀取向量資料
+	if (dataManager->LoadMatrixData())
+	{
+		//將VariableList中項目先做清除
+		VariableList->Items->Clear();
+		//取得所有向量資料
+		std::map<std::string, Matrix>& matrices = dataManager->GetMatrices();
+
+		for (auto it = matrices.begin(); it != matrices.end(); it++)
+		{
+			//將檔案名稱存入暫存
+			String ^ tempString = gcnew String(it->first.c_str());
+			//將輸出格式存入暫存
+			tempString += " [";
+			//將輸出資料存入暫存
+			Matrix & target = it->second;
+			for ( int r = 0 ;r  <target.rows; ++r) {
+				for ( int c = 0; c < target.cols ; ++c)
+				{
+					tempString += (target[r][c]).ToString() + ", ";
+				}
+				tempString += Environment::NewLine;
+			}
+			//將輸出格式存入暫存
+			tempString += "]";
+			//將項目加入VariableList中
+			VariableList->Items->Add(tempString);
+		}
+		contextOP = 1;
+		Output->Text += "-Matrix datas have been loaded-" + Environment::NewLine;
+	}
 }
 
 

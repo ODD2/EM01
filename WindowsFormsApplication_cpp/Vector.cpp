@@ -100,7 +100,7 @@ Vector nrmlz(const Vector &r) {
 }
 
 Vector angle(const Vector &l, const Vector &r) {
-	if (l.dim() != r.dim()) {
+	if (l.dim() == r.dim()) {
 		Vector ret(1);
 		ret[0] = std::acos(mult(l, r)[0] / (length(l)[0] * length(r)[0])) / 3.1415925 * 180;
 
@@ -111,7 +111,8 @@ Vector angle(const Vector &l, const Vector &r) {
 }
 
 Vector planeNormal(const Vector &l, const Vector &r) {
-	return nrmlz(cross(l, r));
+	//return nrmlz(cross(l, r)); //normalized;
+	return cross(l, r);
 }
 
 bool parallel(const Vector &l,const Vector &r) {

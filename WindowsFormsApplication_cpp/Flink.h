@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.h"
+#include "Matrix.h"
 #include <string>
 enum Flink_e{
 	op,
@@ -10,6 +11,7 @@ enum Flink_e{
 union Flink_u {
 	std::string * op;
 	Vector * vec;
+	Matrix * mat;
 };
 struct Flink
 {
@@ -18,10 +20,20 @@ struct Flink
 	Flink * next=nullptr;
 	Flink_u value;
 	~Flink() {
-		if (type == Flink_e::op)
+		switch (type)
+		{
+		case op:
 			delete value.op;
-		else
+			break;
+		case vector:
 			delete value.vec;
+			break;
+		case matrix:
+			delete value.mat;
+			break;
+		default:
+			break;
+		}
 	}
 };
 

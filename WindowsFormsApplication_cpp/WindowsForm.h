@@ -305,6 +305,7 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 	//當Input textbox中的輸入改變時，便會進入此函式
 	//取得向量資料
 	std::map<std::string,Vector>& vectors = dataManager->GetVectors();
+	std::map<std::string, Matrix>& matrices = dataManager->GetMatrices();
 	msclr::interop::marshal_context context;
 
 	//判斷輸入自元為'\n'，並防止取到字串-1位置
@@ -526,6 +527,7 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 					Output->Text += "]" + Environment::NewLine;
 					}
 				}
+				//TODO: 改成支援多向量
 				else if (userCommand[0] == "IsLI") {
 				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
 				std::string right_v = context.marshal_as<std::string>(userCommand[2]);
@@ -671,7 +673,222 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 		}
 		//Matrix環境
 		else if(contextOP == 1){
+			try {
+				if (userCommand[0] == "Calc") {
 
+					std::vector<std::string> formula;//函式
+					for (int i = 1; i < userCommand->Length; ++i) {
+						formula.push_back(context.marshal_as<std::string>(userCommand[i]));
+					}
+
+					Flink * HEAD;
+					Flink * Cur;
+					try {
+						//把函式轉換成後序式
+						Infix2Postfix(formula);
+
+						//轉換成Token Chain
+						int length = 0;
+						for (auto i = formula.begin(); i != formula.end(); ++i, ++length) {
+							if (length == 0) {
+								HEAD = new Flink;
+								Cur = HEAD;
+							}
+							else {
+								Cur->next = new Flink;
+								Cur->next->prev = Cur;
+								Cur = Cur->next;
+							}
+
+							if (MatrixOps.count(*i) == 0) {
+								if (matrices.count(*i) == 0) {
+									std::string msg = "no such instance" + *i;
+									throw std::exception(msg.c_str(), -1);
+								}
+								Cur->type = Flink_e::matrix;
+								Cur->value.mat = new Matrix(matrices[*i]);
+							}
+							else {
+								Cur->type = Flink_e::op;
+								Cur->value.op = new std::string(*i);
+							}
+						}
+
+						//執行每個Op，將計算結果加入Chain中
+						while (length > 1) {
+							Cur = HEAD;
+							while (Cur->type != Flink_e::op) {
+								if (Cur == nullptr)throw std::exception("Error, Incorrect Formula", -1);
+								Cur = Cur->next;
+							}
+							Flink * v2 = Cur->prev;
+							Flink * v1 = v2->prev;
+							Flink * vRet = new Flink;
+							vRet->value.mat = new Matrix(std::move(MatrixOps[*(Cur->value.op)].two(*v1->value.mat, *v2->value.mat)));
+							//setup
+							vRet->type = Flink_e::matrix;
+							vRet->next = Cur->next;
+							if (vRet->next != nullptr) vRet->next->prev = vRet;
+							if (v1 == HEAD) HEAD = vRet;
+							else {
+								vRet->prev = v1->prev;
+								vRet->prev->next = vRet;
+							}
+							//cleanup
+							delete v1;
+							delete v2;
+							delete Cur;
+							length -= 2;
+						}
+
+						//紀錄
+						Output->Text += "result =" + Environment::NewLine + "[" + Environment::NewLine;
+						Matrix& res = *(HEAD->value.mat);
+						for (int i = 0; i < res.rows; ++i) {
+							for (int j = 0; j < res.cols; ++j) {
+								Output->Text += " " + res[i][j].ToString() + " ";
+							}
+							Output->Text += Environment::NewLine;
+						}
+						Output->Text += "]" + Environment::NewLine;
+
+						//清理
+						Cur = HEAD;
+						for (; length > 0; --length) {
+							HEAD = Cur;
+							Cur = HEAD->next;
+							delete HEAD;
+						}
+					}
+					catch (std::exception& e) {
+						Output->Text += gcnew String(e.what()) + Environment::NewLine;
+					}
+
+				}
+				else if (userCommand[0] == "Rank") {
+					if (userCommand->Length != 2) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else {
+						std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+						if (matrices.count(left_v) == 0) {
+							Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+						}
+						else {
+							int rk = rank(matrices[left_v]);
+							Output->Text += "rank = " + rk.ToString() + Environment::NewLine;
+						}
+					}
+				}
+				else if (userCommand[0] == "Trans") {
+				if (userCommand->Length != 2) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					if (matrices.count(left_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Matrix mat = transpose(matrices[left_v]);
+						Output->Text += "result =" + Environment::NewLine + "[" + Environment::NewLine;
+						for (int i = 0; i < mat.rows; ++i) {
+							for (int j = 0; j < mat.cols; ++j) {
+								Output->Text += " " + mat[i][j].ToString() + " ";
+							}
+							Output->Text += Environment::NewLine;
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				}
+				else if (userCommand[0] == "Solve") {
+					if (userCommand->Length != 3) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else {
+						std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+						std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+						if (matrices.count(left_v) == 0) {
+							Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+						}
+						else if (matrices.count(right_v) == 0) {
+							Output->Text += "Error, matrix " + userCommand[2] + " undefined." + Environment::NewLine;
+						}
+						else {
+							std::vector<std::vector<std::string>> result = solve(matrices[left_v], matrices[right_v]);
+							Output->Text += "result =" + Environment::NewLine;
+							for (int i = 0; i < result.size(); ++i) {
+								std::vector<std::string>& answears = result[i];
+								Output->Text += "A" + i.ToString() + ": " + Environment::NewLine;
+								for (int j = 0; j < answears.size(); ++j) {
+									Output->Text += gcnew String(answears[j].c_str()) + Environment::NewLine;
+								}
+							}
+							Output->Text += Environment::NewLine;
+						}
+					}
+				}
+				else if (userCommand[0] == "Det") {
+
+				}
+				else if (userCommand[0] == "Inv") {
+				if (userCommand->Length != 2) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					if (matrices.count(left_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Matrix mat = inverse(matrices[left_v]);
+						Output->Text += "result =" + Environment::NewLine + "[" + Environment::NewLine;
+						for (int i = 0; i < mat.rows; ++i) {
+							for (int j = 0; j < mat.cols; ++j) {
+								Output->Text += " " + mat[i][j].ToString() + " ";
+							}
+							Output->Text += Environment::NewLine;
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				}
+				else if (userCommand[0] == "Eigen") {
+
+				}
+				else if (userCommand[0] == "PM") {//Power Method
+
+				}
+				else if (userCommand[0] == "RR") {//Reduce Row Echelon Form
+					if (userCommand->Length != 2) {
+						Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+					}
+					else {
+						std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+						if (matrices.count(left_v) == 0) {
+							Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+						}
+						else {
+							Matrix mat = guass(matrices[left_v]);
+							Output->Text += "result =" + Environment::NewLine + "[" + Environment::NewLine;
+							for (int i = 0; i < mat.rows; ++i) {
+								for (int j = 0; j < mat.cols; ++j) {
+									Output->Text += " " + mat[i][j].ToString() + " ";
+								}
+								Output->Text += Environment::NewLine;
+							}
+							Output->Text += "]" + Environment::NewLine;
+						}
+					}
+				}
+				else if (userCommand[0] == "LSqrt") {//Least Square Method
+
+				}
+			}
+			catch (std::exception&e) {
+				Output->Text += gcnew String(e.what()) + Environment::NewLine;
+			}
 		}
 
 		userInput = "";
@@ -748,14 +965,16 @@ private: System::Void openFileDialog2_FileOk(System::Object^  sender, System::Co
 			//將輸出資料存入暫存
 			Matrix & target = it->second;
 			for ( int r = 0 ;r  <target.rows; ++r) {
+				tempString += " [";
 				for ( int c = 0; c < target.cols ; ++c)
 				{
-					tempString += (target[r][c]).ToString() + ", ";
+					tempString += (target[r][c]).ToString();
+					if( (c+1) != target.cols) tempString += ",";
 				}
-				tempString += Environment::NewLine;
+				tempString += "] ";
 			}
 			//將輸出格式存入暫存
-			tempString += "]";
+			tempString += "] ";
 			//將項目加入VariableList中
 			VariableList->Items->Add(tempString);
 		}

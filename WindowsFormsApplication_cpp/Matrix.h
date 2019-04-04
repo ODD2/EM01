@@ -12,10 +12,12 @@ struct Matrix
 	//ptrs
 	std::vector<Vector> * rref = nullptr;
 	std::vector<Vector> * inv = nullptr;
-	bool hasinv = true;
+
 	//values
 	unsigned int rows;
 	unsigned int cols;
+	bool noinv = false;
+	double det = 0;
 	std::vector<Vector> Data;
 	Vector& operator [](std::size_t index) {
 		return Data[index];
@@ -47,5 +49,5 @@ Matrix multm(const Matrix & l, const Matrix & r);
 Matrix transpose(const Matrix &m);
 Matrix guass(Matrix &l);
 Matrix inverse(Matrix &l);
-
+double determ(Matrix &l);
 extern std::map<std::string, MatFunc> MatrixOps;

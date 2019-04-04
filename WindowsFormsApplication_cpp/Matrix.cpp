@@ -5,7 +5,10 @@
 #define DIM_ERR throw std::exception("Matrix Dimension Error", -1);
 #define WID_ERR throw std::exception("Matrix Width Error", -1);
 #define CON_ERR throw std::exception("Matrix Constraint Error",-1);
+#define SQR_ERR throw std::exception("Matrix Not Square",-1);
+#define DET_ERR throw std::exception("Matrix No Determinant",-1);
 #define NO_INVERSE throw std::exception("No Inverse for this Matrix",-1);
+#define _ERR(x) throw std::exception(x,-1);
 #define ZERO 0.0000001
 typedef std::pair<int, std::pair<Vector, Vector>> IVV;
 
@@ -24,7 +27,8 @@ Matrix::Matrix(const Matrix& mat) {
 	Data = mat.Data;
 	rows = mat.rows;
 	cols = mat.cols;
-	hasinv = mat.hasinv;
+	det = mat.det;
+	noinv = mat.noinv;
 	if (mat.rref != nullptr) {
 		rref = new std::vector<Vector>(*(mat.rref));
 	}
@@ -39,7 +43,8 @@ Matrix::Matrix(Matrix&& mat) {
 		Data = std::move(mat.Data);
 		rows = mat.rows;
 		cols = mat.cols;
-		hasinv = mat.hasinv;
+		det = mat.det;
+		noinv = mat.noinv;
 		if (mat.rref != nullptr) {
 			rref = mat.rref;
 			mat.rref = nullptr;
@@ -55,7 +60,8 @@ Matrix Matrix::operator=(const Matrix & mat) {
 	Data = mat.Data;
 	rows = mat.rows;
 	cols = mat.cols;
-	hasinv = mat.hasinv;
+	det = mat.det;
+	noinv = mat.noinv;
 	if (mat.rref != nullptr) {
 		rref = new std::vector<Vector>(*(mat.rref));
 	}
@@ -203,17 +209,17 @@ Matrix guass(Matrix &l) {
 		for (int i_r = r + 1; i_r < ROWS; ++i_r) {
 			Vector & _rowVec = sorted[i_r].second;
 			double multiplier = _rowVec[c];
-			if (fabs(multiplier) < ZERO) {
-				_rowVec[c] = 0.0;
-				continue;
+			if (multiplier == 0) {
+				//Afterward vectors  has larger equal leading zeros.
+				break;
 			}
 			bool leadZero = true;
 			for (int i_c = c; i_c < COLS; ++i_c) {
 				_rowVec[i_c] -= multiplier * rowVec[i_c];
 				//Deviation Removal
-				if (leadZero && fabs(_rowVec[i_c]) < ZERO) {
-					sorted[i_r].first += 1;
+				if (fabs(_rowVec[i_c]) < ZERO) {
 					_rowVec[i_c] = 0.0;
+					if(leadZero) sorted[i_r].first += 1;
 				}
 				else leadZero = false;
 			}
@@ -231,12 +237,14 @@ Matrix guass(Matrix &l) {
 		for (int i_rr = i_r - 1; i_rr >= 0; --i_rr) {
 			Vector & target = sorted[i_rr].second;
 			double multiplier = target[leading0];
+			//Deviation Removal & Multiplier Zero
 			if (fabs(multiplier) < ZERO) {
 				target[leading0] = 0;
 				continue;
 			}
 			for (int i_c = leading0; i_c < COLS; ++i_c) {
 				target[i_c] -= multiplier * base[i_c];
+				//Deviation Removal
 				if (fabs(target[i_c]) < ZERO) {
 					target[i_c] = 0;
 				}
@@ -313,17 +321,17 @@ std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r) {
 			Vector & _ansVec = sorted[i_r].second.second;
 			
 			double multiplier = _rowVec[c];
-			if (fabs(multiplier) < ZERO) {
-				_rowVec[c] = 0.0;
-				continue;
+			if (multiplier == 0) {
+				//Afterward vectors  has larger equal leading zeros.
+				break;
 			}
 			bool leadZero = true;
 			for (int i_c = c; i_c < COLS; ++i_c) {
 				_rowVec[i_c] -= multiplier * rowVec[i_c];
 				//Deviation Removal
-				if (leadZero && fabs(_rowVec[i_c]) < ZERO) {
-					sorted[i_r].first += 1;
+				if (fabs(_rowVec[i_c]) < ZERO) {
 					_rowVec[i_c] = 0.0;
+					if (leadZero) sorted[i_r].first += 1;
 				}
 				else leadZero = false;
 			}
@@ -352,12 +360,14 @@ std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r) {
 			Vector & _rowVec = sorted[i_rr].second.first;
 			Vector & _ansVec = sorted[i_rr].second.second;
 			double multiplier = _rowVec[leading0];
+			//Deviation Removal & Multiplier Zero
 			if (fabs(multiplier) < ZERO) {
 				_rowVec[leading0] = 0;
 				continue;
 			}
 			for (int i_c = leading0; i_c < COLS; ++i_c) {
 				_rowVec[i_c] -= multiplier * rowVec[i_c];
+				//Deviation Removal
 				if (fabs(_rowVec[i_c]) < ZERO) {
 					_rowVec[i_c] = 0;
 				}
@@ -404,12 +414,12 @@ std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r) {
 	return result;
 }
 
-//Deal only square vectors
+//CAUTION!!! This Function Deals ONLY SQUARE Matrices.
 Matrix inverse( Matrix &l) {
-	//Deal only square vectors
-	if(l.rows!=l.cols)CON_ERR
+	//Deal only square matrices
+	if(l.rows!=l.cols) SQR_ERR
 	//If singular
-	else if(!l.hasinv)NO_INVERSE
+	else if(l.noinv) NO_INVERSE
 	//If generated Inverse.
 	else if (l.inv != nullptr) {
 		Matrix ret; 
@@ -419,12 +429,17 @@ Matrix inverse( Matrix &l) {
 		return ret;
 	}
 
-//If not generated;
+	
+    //If not generated;
 	int COLS = l.cols;
 	int ROWS = l.rows;
 	int ACOLS = ROWS;
 	int AROWS = ROWS;
 	const Matrix r = Matrix::Identity(ROWS);
+	//Determinant Preparation;
+	int swaps = 0;
+	double det = 1;
+
 
 	//Sort
 	std::vector<IVV> sorted;
@@ -437,6 +452,8 @@ Matrix inverse( Matrix &l) {
 				for (int k = 0, lk = sorted.size(); k < lk; ++k) {
 					if (j < sorted[k].first) {
 						sorted.insert(sorted.begin() + k, std::move(entity));
+						//Counting swaps;
+						swaps += (lk - k) % 2;
 						insert = true;
 						break;
 					}
@@ -450,24 +467,31 @@ Matrix inverse( Matrix &l) {
 			else l[i][j] = 0;
 		}
 		if (!insert) {
-			l.hasinv = false;
+			l.noinv = true;
+			l.det = 0;
 			NO_INVERSE
 		}
 	}
 
-	//Elimination
-	int limit = ROWS < COLS ? ROWS : COLS;
+    //Elimination && Determinating
+	int limit = ROWS;
 	for (int r = 0; r < limit; ++r) {
-		//Skipping leading zeros
+
 		Vector & rowVec = sorted[r].second.first;
 		Vector & ansVec = sorted[r].second.second;
+		//Skipping leading zeros
 		int c = sorted[r].first;
+
+		//Inverse Error Condition.
 		if (c != r || c == COLS) {
-			l.hasinv = false;
+			l.noinv = true;
+			l.det = 0;
 			NO_INVERSE
 		}
+
 		//Normalize
 		double divident = rowVec[c];
+		det *= divident; //det.
 		for (int i_c = c; i_c < COLS; ++i_c) {
 			rowVec[i_c] /= divident;
 		}
@@ -504,7 +528,33 @@ Matrix inverse( Matrix &l) {
 		}
 
 		//Sort
-		if (r + 1 != ROWS)	std::qsort(&sorted[r + 1], ROWS - 1 - r, sizeof(IVV), comp_1);
+		//OLD Method
+		//if (r + 1 != ROWS)	std::qsort(&sorted[r + 1], ROWS - 1 - r, sizeof(IVV), comp_1);
+
+		//Base on the Sqaure and Inverse Criterion Condition.
+		//Sorting can be easy and straight forward.
+		//NEW Method
+		if (r + 1 != ROWS) {
+			int _swap = 0;
+			int front = r, back = ROWS, pivot = r + 1;
+			bool hasreq = false;
+			while (1) {
+				while (sorted[++front].first == pivot && (hasreq = true) && front + 1 < ROWS);
+				while (sorted[--back].first != pivot && back > front);
+				if (back <= front) break;
+				std::swap(sorted[front], sorted[back]);
+				++_swap;
+			}
+			if (!hasreq) {
+				//Error cannot find row with pivot at  r+1;
+				l.noinv = true;
+				l.det = 0;
+				NO_INVERSE
+			}
+			else {
+				swaps += _swap % 2;
+			}
+		}
 	}
 
 	//CleanUp
@@ -553,9 +603,28 @@ Matrix inverse( Matrix &l) {
 		l.inv->push_back(std::move(trg));
 	}
 		
+	//Save determinant
+	l.det = swaps % 2 ? -det : det;
 	
-
 	return result;
+}
+
+double determ(Matrix &l) {
+	if (l.rows != l.cols)CON_ERR
+	else if (l.noinv) return 0; //Sqaure but noinverse means no det;
+	else if (l.inv != nullptr) {
+		//Generated det and inverse.
+		return l.det;
+	}
+	else {
+		try
+		{
+			//Not yet generated det and inverse.
+			inverse(l);
+		}
+		catch (const std::exception& e) {}
+		return l.det;
+	}
 }
 
 std::map<std::string, MatFunc> MatrixOps = {

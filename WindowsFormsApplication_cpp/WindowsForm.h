@@ -830,7 +830,19 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 					}
 				}
 				else if (userCommand[0] == "Det") {
-
+				if (userCommand->Length != 2) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					if (matrices.count(left_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						double vl = determ(matrices[left_v]);
+						Output->Text += "det = " + vl.ToString() + Environment::NewLine;
+					}
+				}
 				}
 				else if (userCommand[0] == "Inv") {
 				if (userCommand->Length != 2) {

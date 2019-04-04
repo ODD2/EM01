@@ -11,6 +11,7 @@
 #define _ERR(x) throw std::exception(x,-1);
 #define ZERO 0.0000001
 typedef std::pair<int, std::pair<Vector, Vector>> IVV;
+typedef std::pair<int, Vector> IV;
 
 Matrix::Matrix():rows(0),cols(0)
 {
@@ -77,6 +78,123 @@ Matrix::~Matrix() {
 	}
 	if (inv != nullptr) {
 		delete inv;
+	}
+}
+
+void Matrix::Det() {
+	//Deal only square matrices
+	if (detcalc)return;
+	else if (rows != cols || noinv)
+	{
+		det = 0;
+		detcalc = true;
+		return;
+	}
+	else {
+		detcalc = true;
+		//If not generated;
+		int DIM = cols;
+		//Determinant Preparation;
+		int swaps = 0;
+		double _det = 1;
+
+		//Sort
+		std::vector<IV> sorted;
+		for (int i = 0; i < DIM; ++i) {
+			bool insert = false;
+			IV entity; entity.second = Data[i];
+			for (int j = 0; j < DIM; ++j) {
+				if (fabs(Data[i][j]) > ZERO) {
+					entity.first = j;
+					for (int k = 0, lk = sorted.size(); k < lk; ++k) {
+						if (j < sorted[k].first) {
+							sorted.insert(sorted.begin() + k, std::move(entity));
+							//Counting swaps;
+							swaps += (lk - k) % 2;
+							insert = true;
+							break;
+						}
+					}
+					if (!insert) {
+						sorted.push_back(std::move(entity));
+						insert = true;
+					}
+					break;
+				}
+				else Data[i][j] = 0;
+			}
+			if (!insert) {
+				det = 0;
+				return;
+			}
+		}
+
+		//Elimination && Determinating
+		for (int r = 0; r < DIM; ++r) {
+
+			Vector & rowVec = sorted[r].second;
+			//Skipping leading zeros
+			int c = sorted[r].first;
+
+			//Inverse Error Condition.
+			if (c != r || c == DIM) {
+				det = 0;
+				return;
+			}
+
+			//Normalize
+			double divident = rowVec[c];
+			_det *= divident; //det.
+			for (int i_c = c; i_c < DIM; ++i_c) {
+				rowVec[i_c] /= divident;
+			}
+			//Eliminate
+			for (int i_r = r + 1; i_r < DIM; ++i_r) {
+				Vector & _rowVec = sorted[i_r].second;
+
+				double multiplier = _rowVec[c];
+				if (fabs(multiplier) < ZERO) {
+					_rowVec[c] = 0.0;
+					continue;
+				}
+				bool leadZero = true;
+				for (int i_c = c; i_c < DIM; ++i_c) {
+					_rowVec[i_c] -= multiplier * rowVec[i_c];
+					//Deviation Removal
+					if (leadZero && fabs(_rowVec[i_c]) < ZERO) {
+						sorted[i_r].first += 1;
+						_rowVec[i_c] = 0.0;
+					}
+					else leadZero = false;
+				}
+			}
+
+			//Sort
+			if (r + 1 != DIM) {
+				int _swap = 0;
+				int front = r, back = DIM, pivot = r + 1;
+				bool hasreq = false;
+				while (1) {
+					while (sorted[++front].first == pivot && (hasreq = true) && front + 1 < DIM);
+					while (sorted[--back].first != pivot && back > front);
+					if (back <= front) break;
+					std::swap(sorted[front], sorted[back]);
+					++_swap;
+				}
+				if (!hasreq) {
+					//Error cannot find row with pivot at  r+1;
+					det = 0;
+					return;
+				}
+				else {
+					swaps += _swap % 2;
+				}
+			}
+		}
+
+		//Save determinant
+		det = swaps % 2 ? -(_det) : _det;
+		return;
 	}
 }
 
@@ -417,7 +535,12 @@ std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r) {
 //CAUTION!!! This Function Deals ONLY SQUARE Matrices.
 Matrix inverse( Matrix &l) {
 	//Deal only square matrices
-	if(l.rows!=l.cols) SQR_ERR
+	if (l.rows != l.cols)
+	{
+		l.det = 0;
+		l.detcalc = true;
+		SQR_ERR
+	}
 	//If singular
 	else if(l.noinv) NO_INVERSE
 	//If generated Inverse.
@@ -437,8 +560,10 @@ Matrix inverse( Matrix &l) {
 	int AROWS = ROWS;
 	const Matrix r = Matrix::Identity(ROWS);
 	//Determinant Preparation;
+	l.detcalc = true; //executing this function must result a determinant.
 	int swaps = 0;
 	double det = 1;
+
 
 
 	//Sort
@@ -594,7 +719,7 @@ Matrix inverse( Matrix &l) {
 	Matrix result;
 	result.cols = COLS;
 	result.rows = ROWS;
-	//Save generated inverse
+	//Save inverse
 	l.inv = new std::vector<Vector>;
 	for (int i = 0; i < ROWS; ++i)
 	{
@@ -602,20 +727,24 @@ Matrix inverse( Matrix &l) {
 		result.Data.push_back(trg);
 		l.inv->push_back(std::move(trg));
 	}
-		
+
 	//Save determinant
 	l.det = swaps % 2 ? -det : det;
+
+	//Save rref if not exist
+	if (l.rref == nullptr) {
+		l.rref = new std::vector<Vector>(Matrix::Identity(ROWS).Data);
+	}
 	
 	return result;
 }
 
 double determ(Matrix &l) {
-	if (l.rows != l.cols)CON_ERR
-	else if (l.noinv) return 0; //Sqaure but noinverse means no det;
-	else if (l.inv != nullptr) {
-		//Generated det and inverse.
-		return l.det;
+	if (l.rows != l.cols) {
+		l.detcalc = true;
+		CON_ERR
 	}
+	else if (l.detcalc) return l.det;
 	else {
 		try
 		{
@@ -624,6 +753,50 @@ double determ(Matrix &l) {
 		}
 		catch (const std::exception& e) {}
 		return l.det;
+	}
+}
+
+Matrix adjoint(Matrix &l) {
+	if (l.cols != l.rows)CON_ERR
+	else{
+		int DIM = l.rows;
+		double det = determ(l);
+		if (det == 0) {
+			Matrix ret(DIM, DIM);
+			Matrix tmp(DIM - 1, DIM - 1);
+			//Create Cofactor
+			for (int r = 0; r < DIM; ++r) {
+				for (int c = 0; c < DIM; ++c) {
+					int tilt_r = 0;
+					//Init tmp mat;
+					tmp.detcalc = false;
+					for (int i_r = 0; i_r < DIM; ++i_r) {
+						if (i_r == r) {
+							tilt_r = 1;
+							continue;
+						}
+						int tilt_c = 0;
+						for (int i_c = 0; i_c < DIM; ++i_c) {
+							if (i_c == c)
+							{
+								tilt_c = 1;
+								continue;
+							}
+							tmp[i_r - tilt_r][i_c - tilt_c] = l[i_r][i_c];
+						}
+					}
+					tmp.Det();
+					ret[r][c] = (r + c) % 2 ? -tmp.det : tmp.det;
+				}
+			}
+			return ret;
+		}
+		else {
+			Matrix id = Matrix::Identity(DIM,det);
+			Matrix inv; inv.rows = DIM; inv.cols = DIM;
+			inv.Data = *l.inv;
+			return multm(inv, id);
+		}
 	}
 }
 

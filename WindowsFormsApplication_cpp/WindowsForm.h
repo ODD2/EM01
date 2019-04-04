@@ -866,6 +866,28 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 					}
 				}
 				}
+				else if (userCommand[0] == "Adj") {
+				if (userCommand->Length != 2) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					if (matrices.count(left_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Matrix mat = adjoint(matrices[left_v]);
+						Output->Text += "result =" + Environment::NewLine + "[" + Environment::NewLine;
+						for (int i = 0; i < mat.rows; ++i) {
+							for (int j = 0; j < mat.cols; ++j) {
+								Output->Text += " " + mat[i][j].ToString() + " ";
+							}
+							Output->Text += Environment::NewLine;
+						}
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
+				}
 				else if (userCommand[0] == "Eigen") {
 
 				}

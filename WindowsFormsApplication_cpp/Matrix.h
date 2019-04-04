@@ -16,22 +16,34 @@ struct Matrix
 	//values
 	unsigned int rows;
 	unsigned int cols;
-	bool noinv = false;
+
 	double det = 0;
+
+	bool noinv = false;
+	bool detcalc = false;
+
 	std::vector<Vector> Data;
+
+	//access functions.
 	Vector& operator [](std::size_t index) {
 		return Data[index];
 	}
 	Vector operator [](std::size_t index) const {
 		return Data[index];
 	}
-	static Matrix Identity(int n) {
+	
+	//tool functions.
+	static Matrix Identity(int n,double v = 1.0) {
 		Matrix ret(n, n);
 		for (int i = 0; i < n; ++i) {
-			ret[i][i] = 1;
+			ret[i][i] = v;
 		}
 		return ret;
 	}
+
+	//single functions.
+	void Det();
+	//void Inv();
 };
 
 union MatFunc {
@@ -49,5 +61,6 @@ Matrix multm(const Matrix & l, const Matrix & r);
 Matrix transpose(const Matrix &m);
 Matrix guass(Matrix &l);
 Matrix inverse(Matrix &l);
+Matrix adjoint(Matrix &l); 
 double determ(Matrix &l);
 extern std::map<std::string, MatFunc> MatrixOps;

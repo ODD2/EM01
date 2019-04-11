@@ -547,10 +547,13 @@ std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r) {
 			Vector & reqVec = sorted[r].second.first;
 			for (int ac = 0; ac < COLS; ++ac) {
 				if (reqVec[ac] != 0) {
-					if (formula.size() != 0) {
-						formula += "+";
+					if (formula.size() != 0&&reqVec[ac] > 0) {
+							formula += "+";
 					}
-					formula += std::to_string(reqVec[ac]) + "*(x" + std::to_string(ac)+")";
+					if (reqVec[ac] != 1)
+						formula += std::to_string(reqVec[ac]) + "*";
+
+					formula += "(x" + std::to_string(ac) + ")";
 				}
 			}
 			double value = sorted[r].second.second[c];
@@ -919,7 +922,7 @@ Matrix powerMethod(const Matrix &l) {
 	}
 }
 
-Matrix eigenValue(Matrix &l) {
+std::vector<std::vector<std::string>> eigenValue(Matrix &l) {
 	if (l.cols != l.rows) CON_ERR
 	else if (l.rows > 3) DIM_ERR
 	else {
@@ -965,10 +968,10 @@ Matrix eigenValue(Matrix &l) {
 		}
 
 		//removing deviations
-		for (int i = 0; i < eigens.size(); ++i) {
+	/*	for (int i = 0; i < eigens.size(); ++i) {
 			if (ceil(eigens[i]) - eigens[i] < ZERO) eigens[i] = ceil(eigens[i]);
 			else  if (eigens[i] - floor(eigens[i]) < ZERO) eigens[i] = floor(eigens[i]);
-		}
+		}*/
 		std::vector<std::vector<std::string>> results;
 		Matrix zeros(l.rows, 1);
 		for (int i = 0; i < eigens.size(); ++i) {
@@ -976,11 +979,14 @@ Matrix eigenValue(Matrix &l) {
 			for (int j = 0; j < eigenMatrix.cols; ++j)
 				eigenMatrix[j][j] -= eigens[i];
 			results.push_back(solve(eigenMatrix,zeros)[0]);	
-			std::cout << eigens[i] << "\n";
+			std::string tmp = "Eigen: " + std::to_string(eigens[i]);
+			results[i].push_back(tmp);
+			/*std::cout << eigens[i] << "\n";
 			for (int j = 0, k = results[i].size(); j < k; ++j) {
 				std::cout << results[i][j] << "\n";
-			}
+			}*/
 		}
+		return results;
 	}
 }
 

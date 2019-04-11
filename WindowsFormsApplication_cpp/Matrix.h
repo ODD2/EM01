@@ -56,7 +56,7 @@ union MatFunc {
 };
 
 std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r);
-
+std::vector<std::vector<std::string>> eigenValue(Matrix &l);
 Matrix addm(const Matrix & l, const Matrix & r);
 Matrix subm(const Matrix & l, const Matrix & r);
 Matrix multm(const Matrix & l, const Matrix & r);
@@ -66,7 +66,6 @@ Vector leastsquare(Matrix &l, Matrix &r);
 Matrix guass(Matrix &l);
 Matrix inverse(Matrix &l);
 Matrix adjoint(Matrix &l); 
-Matrix eigenValue(Matrix &l);
 double determ(Matrix &l);
 bool independent(Matrix &m);
 int rank(Matrix &m);

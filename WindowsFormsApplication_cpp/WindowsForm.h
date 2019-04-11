@@ -931,20 +931,16 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
 					}
 					else {
-						Matrix mat = eigenValue(matrices[left_v]);
-						//System::Text::StringBuilder ^sb = gcnew System::Text::StringBuilder();
-						//sb->AppendLine("result:");
-						//sb->AppendFormat("Value = {0}", mat[1][0]); sb->AppendLine();
-						//Output->Text = sb->ToString();
-					/*	Output->Text += "result:" NEWL
-							" Value = " + mat[1][0] NEWL
-							" Vector = " NEWL
-							"["  ENDL
-							for (int j = 0; j < mat.cols; ++j) {
-								Output->Text += " " + mat[0][j].ToString() + " ";
+						std::vector<std::vector<std::string>> result = eigenValue(matrices[left_v]);
+						Output->Text += "result =" + Environment::NewLine;
+						for (int i = 0; i < result.size(); ++i) {
+							std::vector<std::string>& answears = result[i];
+							Output->Text += "A" + i.ToString() + ": " + Environment::NewLine;
+							for (int j = 0; j < answears.size(); ++j) {
+								Output->Text += gcnew String(answears[j].c_str()) + Environment::NewLine;
 							}
+						}
 						Output->Text += Environment::NewLine;
-						Output->Text += "]" + Environment::NewLine;*/
 					}
 				}
 				}

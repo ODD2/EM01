@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <exception>
 #include <math.h>
+#define _PI 3.1415925
 #define DIM_ERR throw std::exception("Vector Dimension Error", -1);
 
 
@@ -73,9 +74,16 @@ Vector proj(const Vector&l, const Vector&r) {
 }
 
 Vector triangle(const Vector &l, const Vector &r) {
-	Vector half(1);
-	half[0] = 0.5;
-	return mult(half, length(cross(l, r)));
+	
+	if (l.dim() == r.dim()) {
+		Vector ret(1);
+		double l_l = length(l)[0], l_r = length(r)[0];
+		double sinv = pow(1 - pow(mult(l, r)[0] / (l_l * l_r), 2), 0.5);
+		ret[0] = l_l * l_r * sinv / 2;
+		return ret;
+	}
+	else
+		DIM_ERR
 }
 
 //The Magnitude of a Vector
@@ -102,7 +110,7 @@ Vector nrmlz(const Vector &r) {
 Vector angle(const Vector &l, const Vector &r) {
 	if (l.dim() == r.dim()) {
 		Vector ret(1);
-		ret[0] = std::acos(mult(l, r)[0] / (length(l)[0] * length(r)[0])) / 3.1415925 * 180;
+		ret[0] = std::acos(mult(l, r)[0] / (length(l)[0] * length(r)[0])) / _PI * 180;
 
 		return ret;
 	}
@@ -169,6 +177,7 @@ std::vector<Vector> gram_schmidt(std::vector<Vector> ret) {
 	}
 	return ret;
 }
+
 std::vector<Vector> gram_schmidt(Vector l, ...) {
 	va_list ap;
 	va_start(ap, l);

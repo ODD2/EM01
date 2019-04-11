@@ -5,6 +5,8 @@ struct Matrix
 	
 	Matrix();
 	Matrix(unsigned int rows, unsigned int cols);
+	Matrix(unsigned int rows, unsigned int cols,const std::vector<Vector>& Data);
+	Matrix(const std::vector<Vector>& mat);
 	Matrix(const Matrix& mat);
 	Matrix(Matrix&& mat);
 	Matrix operator=(const Matrix & mat);
@@ -54,13 +56,21 @@ union MatFunc {
 };
 
 std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r);
-int rank(Matrix &m);
+
 Matrix addm(const Matrix & l, const Matrix & r);
 Matrix subm(const Matrix & l, const Matrix & r);
 Matrix multm(const Matrix & l, const Matrix & r);
 Matrix transpose(const Matrix &m);
+Matrix powerMethod(const Matrix &l);
+Vector leastsquare(Matrix &l, Matrix &r);
 Matrix guass(Matrix &l);
 Matrix inverse(Matrix &l);
 Matrix adjoint(Matrix &l); 
+Matrix eigenValue(Matrix &l);
 double determ(Matrix &l);
+bool independent(Matrix &m);
+int rank(Matrix &m);
+
+
+
 extern std::map<std::string, MatFunc> MatrixOps;

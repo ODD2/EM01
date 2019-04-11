@@ -1,4 +1,5 @@
 #include "Matrix.h"
+#include <iostream>
 #include <stdarg.h>
 #include <exception>
 #include <math.h>
@@ -8,8 +9,11 @@
 #define SQR_ERR throw std::exception("Matrix Not Square",-1);
 #define DET_ERR throw std::exception("Matrix No Determinant",-1);
 #define NO_INVERSE throw std::exception("No Inverse for this Matrix",-1);
+#define IMG_EIGEN throw std::exception("Imagine Eigen Value",-1);
 #define _ERR(x) throw std::exception(x,-1);
 #define ZERO 0.0000001
+#define EIGEN_TOLERANCE 0.0001 
+#define _PI 3.1415926
 typedef std::pair<int, std::pair<Vector, Vector>> IVV;
 typedef std::pair<int, Vector> IV;
 
@@ -21,6 +25,19 @@ Matrix::Matrix(unsigned int rows, unsigned int cols):rows(rows),cols(cols),Data(
 	for (int i = 0; i < rows; i++) {
 		Data[i] = Vector(cols);
 	}
+}
+
+Matrix::Matrix(unsigned int rows, unsigned int cols, const std::vector<Vector>& Data):
+	rows(rows),cols(cols),Data(Data) 
+{
+
+}
+
+Matrix::Matrix(const std::vector<Vector>& mat) {
+	Data = mat;
+	rows = mat.size();
+	if (rows)
+		cols = mat[0].dim();
 }
 
 //copy constructor
@@ -252,6 +269,23 @@ Matrix transpose(const Matrix &m) {
 	return ret;
 }
 
+bool independent( Matrix &m) {
+	std::vector<Vector> * rref;
+	if (m.cols > m.rows) return false;
+	else if (m.rref != nullptr) {
+		rref = m.rref;
+	}
+	else {
+		guass(m);
+		rref = m.rref;
+	}
+	int COLS = m.cols;
+	for (int i = 0; i < COLS; ++i) {
+		if ((*rref)[i][i] != 1)return false;
+	}
+	return true;
+}
+
 int rank(Matrix &m) {
 	int rk = 0;
 	if (m.rref == nullptr) {
@@ -318,15 +352,11 @@ Matrix guass(Matrix &l) {
 		Vector & rowVec = sorted[r].second;
 		int c = sorted[r].first;
 		if (c == COLS)break;
-		//Normalize
-		double divident = rowVec[c];
-		for (int i_c = c; i_c <COLS; ++i_c) {
-			rowVec[i_c] /= divident;
-		}
+	
 		//Eliminate
 		for (int i_r = r + 1; i_r < ROWS; ++i_r) {
 			Vector & _rowVec = sorted[i_r].second;
-			double multiplier = _rowVec[c];
+			double multiplier = _rowVec[c]/rowVec[c];
 			if (multiplier == 0) {
 				//Afterward vectors  has larger equal leading zeros.
 				break;
@@ -343,6 +373,11 @@ Matrix guass(Matrix &l) {
 			}
 		}
 
+		//Normalize
+		double divident = rowVec[c];
+		for (int i_c = c; i_c < COLS; ++i_c) {
+			rowVec[i_c] /= divident;
+		}
 		//Sort
 		if(r + 1 != ROWS )	std::qsort(&sorted[r + 1], ROWS - 1 - r, sizeof(std::pair<int, Vector>), comp_1);
 	}
@@ -425,20 +460,13 @@ std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r) {
 		Vector & ansVec = sorted[r].second.second;
 		int c = sorted[r].first;
 		if (c == COLS)break;
-		//Normalize
-		double divident = rowVec[c];
-		for (int i_c = c; i_c < COLS; ++i_c) {
-			rowVec[i_c] /= divident;
-		}
-		for (int i_c = 0; i_c < ACOLS; ++i_c) {
-			ansVec[i_c] /= divident;
-		}
+	
 		//Eliminate
 		for (int i_r = r + 1; i_r < ROWS; ++i_r) {
 			Vector & _rowVec = sorted[i_r].second.first;
 			Vector & _ansVec = sorted[i_r].second.second;
 			
-			double multiplier = _rowVec[c];
+			double multiplier = _rowVec[c]/ rowVec[c];
 			if (multiplier == 0) {
 				//Afterward vectors  has larger equal leading zeros.
 				break;
@@ -461,6 +489,16 @@ std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r) {
 				}
 			}
 		}
+
+		//Normalize
+		double divident = rowVec[c];
+		for (int i_c = c; i_c < COLS; ++i_c) {
+			rowVec[i_c] /= divident;
+		}
+		for (int i_c = 0; i_c < ACOLS; ++i_c) {
+			ansVec[i_c] /= divident;
+		}
+
 
 		//Sort
 		if (r + 1 != ROWS)	std::qsort(&sorted[r + 1], ROWS - 1 - r, sizeof(IVV), comp_1);
@@ -614,21 +652,13 @@ Matrix inverse( Matrix &l) {
 			NO_INVERSE
 		}
 
-		//Normalize
-		double divident = rowVec[c];
-		det *= divident; //det.
-		for (int i_c = c; i_c < COLS; ++i_c) {
-			rowVec[i_c] /= divident;
-		}
-		for (int i_c = 0; i_c < ACOLS; ++i_c) {
-			ansVec[i_c] /= divident;
-		}
+
 		//Eliminate
 		for (int i_r = r + 1; i_r < ROWS; ++i_r) {
 			Vector & _rowVec = sorted[i_r].second.first;
 			Vector & _ansVec = sorted[i_r].second.second;
 
-			double multiplier = _rowVec[c];
+			double multiplier = _rowVec[c]/rowVec[c];
 			if (fabs(multiplier) < ZERO) {
 				_rowVec[c] = 0.0;
 				continue;
@@ -650,6 +680,16 @@ Matrix inverse( Matrix &l) {
 					_ansVec[i_c] = 0.0;
 				}
 			}
+		}
+
+		//Normalize
+		double divident = rowVec[c];
+		det *= divident; //det.
+		for (int i_c = c; i_c < COLS; ++i_c) {
+			rowVec[i_c] /= divident;
+		}
+		for (int i_c = 0; i_c < ACOLS; ++i_c) {
+			ansVec[i_c] /= divident;
 		}
 
 		//Sort
@@ -796,6 +836,150 @@ Matrix adjoint(Matrix &l) {
 			Matrix inv; inv.rows = DIM; inv.cols = DIM;
 			inv.Data = *l.inv;
 			return multm(inv, id);
+		}
+	}
+}
+
+Vector leastsquare(Matrix &l, Matrix &r) {
+	//Copy
+	Matrix n_l = l;
+	//n_l.cols += 1;
+	////Insert Constant 
+	//for (auto i = 0; i < n_l.rows; ++i) {
+	//	n_l.Data[i].Data.push_back(1);
+	//}
+	//Calculate
+	Matrix trans = transpose(n_l);
+	Vector res;
+	Matrix result = multm(inverse(multm(trans, n_l)), multm(trans, r));
+	for (int i = 0; i < result.rows; ++i) {
+		res.Data.push_back(result[i][0]);
+	}
+	return res;
+}
+
+Matrix powerMethod(const Matrix &l) {
+	if (l.cols != l.rows)  CON_ERR
+	else {
+		int DIM = l.cols;
+		Matrix initVec(l.rows,1);
+		Matrix A = l.Data;
+		for (int i = 0; i < DIM; ++i) {
+			initVec[i][0] = 1;
+		}
+		Matrix newVec = multm(A, initVec);
+
+		for (int times = 1000; times > 0	; --times) {
+			newVec = multm(A, newVec);
+			//normalize
+			double length = 0;
+			for (int i = 0; i < DIM; ++i) {
+				double &v = newVec[i][0];
+				if (abs(v) < ZERO) {
+					v = 0;
+				}
+				else {
+					length += pow(v, 2);
+				}
+			}
+			length = pow(length, 0.5);
+			for (int i = 0; i < DIM; ++i) {
+				newVec[i][0] /= length;
+			}
+		}
+
+		//Normalize
+		double length = 0;
+		for (int i = 0; i < DIM; ++i) {
+			double &v = newVec[i][0];
+			if (abs(v) < ZERO) {
+				v = 0;
+			}
+			else {
+				length += pow(v, 2);
+			}
+		}
+		length = pow(length, 0.5);
+		for (int i = 0; i < DIM; ++i) {
+			newVec[i][0] /= length;
+		}
+		//Constructing result
+		double eigen = 0;
+		Matrix eigenVec = newVec;
+		newVec = multm(A, newVec);
+		//find eigenvalue
+		for (int i = 0, base = 0; i < DIM; ++i)
+			 if(abs(newVec[i][0]) > ZERO)
+				 eigen = newVec[i][0]/eigenVec[i][0];
+
+		eigenVec = transpose(eigenVec);
+		eigenVec.Data.push_back(Vector(1));
+		eigenVec[1][0] = eigen;
+		return eigenVec;
+	}
+}
+
+Matrix eigenValue(Matrix &l) {
+	if (l.cols != l.rows) CON_ERR
+	else if (l.rows > 3) DIM_ERR
+	else {
+		std::vector<double> eigens;
+		if (l.cols == 2) {
+			double b = -(l[0][0] + l[1][1]); 
+			double c = determ(l); 
+			double cond = pow(b, 2) - 4 * c; 
+
+			//get eigen value
+			if (cond < 0) IMG_EIGEN
+			else if(cond == 0) {
+				eigens.push_back((-b / 2));
+			}
+			else {
+				eigens.push_back((-b + pow(cond, 0.5)) / 2);
+				eigens.push_back((-b - pow(cond, 0.5)) / 2);
+			}
+		}
+		else { //3x3 matrix
+			double a, b, c, j,Q,R,theta;
+			j = l[0][0] + l[1][1];
+			a = -(j + l[2][2]);
+			b = -(l[2][0] * l[0][2] + l[2][1] * l[1][2] + l[1][0] * l[0][1] - l[0][0] * l[1][1] - j * l[2][2]);
+			c = -determ(l);
+			Q = (pow(a, 2) - 3 * b) / 9;
+			R = (2 * pow(a, 3) - 9 * a*b + 27 * c) / 54;
+			if (Q < 0)CON_ERR
+			else if (Q == 0) {
+				eigens.push_back(-a / 3);
+			}
+			else {
+				theta = acos(R / pow(pow(Q, 3), 0.5));
+				double _cos = cos(theta / 3);
+				double _sin = pow( 1 - _cos * _cos,0.5);
+				double _sin60 = pow(3, 0.5) / 2;
+
+				double _Q = pow(Q, 0.5);
+				eigens.push_back(-2 *_Q*cos(theta / 3) - a / 3);
+				eigens.push_back(-2 * _Q*( _cos* -0.5 - _sin60 *_sin ) - a / 3);
+				eigens.push_back(-2 * _Q*( _cos* -0.5 + _sin60 * _sin )- a / 3);
+			}
+		}
+
+		//removing deviations
+		for (int i = 0; i < eigens.size(); ++i) {
+			if (ceil(eigens[i]) - eigens[i] < ZERO) eigens[i] = ceil(eigens[i]);
+			else  if (eigens[i] - floor(eigens[i]) < ZERO) eigens[i] = floor(eigens[i]);
+		}
+		std::vector<std::vector<std::string>> results;
+		Matrix zeros(l.rows, 1);
+		for (int i = 0; i < eigens.size(); ++i) {
+			Matrix eigenMatrix = l;
+			for (int j = 0; j < eigenMatrix.cols; ++j)
+				eigenMatrix[j][j] -= eigens[i];
+			results.push_back(solve(eigenMatrix,zeros)[0]);	
+			std::cout << eigens[i] << "\n";
+			for (int j = 0, k = results[i].size(); j < k; ++j) {
+				std::cout << results[i][j] << "\n";
+			}
 		}
 	}
 }

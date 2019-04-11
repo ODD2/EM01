@@ -2,6 +2,7 @@
 #include"DataManager.h"
 #include"DotNetUtilities.h"
 #include <msclr\marshal_cppstd.h>
+#include <exception>
 
 namespace WindowsFormsApplication_cpp {
 
@@ -288,7 +289,8 @@ namespace WindowsFormsApplication_cpp {
 
 		}
 #pragma endregion
-
+#define NEWL  + Environment::NewLine +
+#define ENDL + Environment::NewLine;
 private: System::Void WindowsForm_Load(System::Object^  sender, System::EventArgs^  e) {
 }
 private: System::Void LoadVectorToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) 
@@ -527,22 +529,53 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 					Output->Text += "]" + Environment::NewLine;
 					}
 				}
-				//TODO: 改成支援多向量
 				else if (userCommand[0] == "IsLI") {
-				std::string left_v = context.marshal_as<std::string>(userCommand[1]);
-				std::string right_v = context.marshal_as<std::string>(userCommand[2]);
-				if (userCommand->Length != 3) {
-					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
-				}
-				else if (vectors.count(left_v) == 0) {
-					Output->Text += "Error, vector " + userCommand[1] + " undefined." + Environment::NewLine;
-				}
-				else if (vectors.count(right_v) == 0) {
-					Output->Text += "Error, vector " + userCommand[2] + " undefined." + Environment::NewLine;
+				
+				if (userCommand->Length < 2) {
+					Output->Text += "Error, Need at least one vector !" + Environment::NewLine;
 				}
 				else {
-					bool ans = independent(vectors[left_v], vectors[right_v]);
-					Output->Text += "IsLI(" + userCommand[1] + "," + userCommand[2] + ") = " + (ans ? "Yes" :"No") + Environment::NewLine;
+					bool ok = true;
+					
+					std::string  vname = context.marshal_as<std::string>(userCommand[1]);
+					std::string msg;
+					if (vectors.count(vname) == 0)
+					{
+						 msg = "Error, vector " + vname + " undefined.";
+						throw std::exception(msg.c_str(), -1);
+					}
+					//initialize m
+					Matrix m(vectors[vname].dim(), userCommand->Length - 1);
+
+
+					for (int i = 0; i < userCommand->Length -1 ; ++i) {
+						vname = context.marshal_as<std::string>(userCommand[i+1]);
+						if (vectors.count(vname) == 0)
+						{
+							msg = "Error, vector " + vname + " undefined.";
+							throw std::exception(msg.c_str(), -1);
+						}
+						else if(vectors[vname].dim() != m.rows) {
+							msg = "Error Dimension!";
+							throw std::exception(msg.c_str(), -1);
+						}
+						else {
+							Vector & colVec = vectors[vname];
+							for (int j = 0; j < m.rows; ++j) {
+								m[j][i] = colVec[j];
+							}
+						}
+					}
+					bool ans = independent(m);
+					Output->Text += "IsLI(";
+					for (int i = 1; i < userCommand->Length; ++i) {
+						Output->Text += userCommand[i];
+						if (i != userCommand->Length - 1) {
+							Output->Text += ",";
+						}
+
+					}
+					Output->Text += ") = " + (ans ? "Yes" : "No") + Environment::NewLine;
 				}
 				}
 				else if (userCommand[0] == "Ob") { 
@@ -889,10 +922,58 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 				}
 				}
 				else if (userCommand[0] == "Eigen") {
-
+				if (userCommand->Length != 2) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					if (matrices.count(left_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Matrix mat = eigenValue(matrices[left_v]);
+						//System::Text::StringBuilder ^sb = gcnew System::Text::StringBuilder();
+						//sb->AppendLine("result:");
+						//sb->AppendFormat("Value = {0}", mat[1][0]); sb->AppendLine();
+						//Output->Text = sb->ToString();
+					/*	Output->Text += "result:" NEWL
+							" Value = " + mat[1][0] NEWL
+							" Vector = " NEWL
+							"["  ENDL
+							for (int j = 0; j < mat.cols; ++j) {
+								Output->Text += " " + mat[0][j].ToString() + " ";
+							}
+						Output->Text += Environment::NewLine;
+						Output->Text += "]" + Environment::NewLine;*/
+					}
+				}
 				}
 				else if (userCommand[0] == "PM") {//Power Method
-
+				if (userCommand->Length != 2) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					if (matrices.count(left_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Matrix mat = powerMethod(matrices[left_v]);
+						//System::Text::StringBuilder ^sb = gcnew System::Text::StringBuilder();
+						//sb->AppendLine("result:");
+						//sb->AppendFormat("Value = {0}", mat[1][0]); sb->AppendLine();
+						//Output->Text = sb->ToString();
+						Output->Text += "result:" NEWL
+													" Value = " + mat[1][0] NEWL
+													" Vector = " NEWL
+													"["  ENDL
+						for (int j = 0; j < mat.cols; ++j) {
+							Output->Text += " " + mat[0][j].ToString() + " ";
+						}
+						Output->Text += Environment::NewLine;
+						Output->Text += "]" + Environment::NewLine;
+					}
+				}
 				}
 				else if (userCommand[0] == "RR") {//Reduce Row Echelon Form
 					if (userCommand->Length != 2) {
@@ -917,7 +998,26 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 					}
 				}
 				else if (userCommand[0] == "LSqrt") {//Least Square Method
-
+				if (userCommand->Length != 3) {
+					Output->Text += "Error, Invalid Syntax" + Environment::NewLine;
+				}
+				else {
+					std::string left_v = context.marshal_as<std::string>(userCommand[1]);
+					std::string right_v = context.marshal_as<std::string>(userCommand[2]);
+					if (matrices.count(left_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
+					}
+					else if (matrices.count(right_v) == 0) {
+						Output->Text += "Error, matrix " + userCommand[2] + " undefined." + Environment::NewLine;
+					}
+					else {
+						Vector result = leastsquare(matrices[left_v], matrices[right_v]);
+						Output->Text += "result =" + Environment::NewLine;
+						for (int i = 0; i < result.dim(); ++i) {
+							Output->Text += result[i].ToString() + ": " + Environment::NewLine;
+						}
+					}
+				}
 				}
 			}
 			catch (std::exception&e) {

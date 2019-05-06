@@ -55,14 +55,15 @@ union MatFunc {
 	Matrix(*three)(const Matrix&, const  Matrix&, const Matrix&);
 };
 
+Vector getEigenVector(Matrix &l);
 std::vector<std::vector<std::string>> solve(const Matrix &l, const Matrix &r);
-std::vector<std::vector<std::string>> eigenValue(Matrix &l);
+std::vector<Vector> eigenValue(Matrix &l);
 Matrix addm(const Matrix & l, const Matrix & r);
 Matrix subm(const Matrix & l, const Matrix & r);
 Matrix multm(const Matrix & l, const Matrix & r);
 Matrix transpose(const Matrix &m);
 Matrix powerMethod(const Matrix &l);
-Vector leastsquare(Matrix &l, Matrix &r);
+Matrix leastsquare(Matrix &l, Matrix &r);
 Matrix guass(Matrix &l);
 Matrix inverse(Matrix &l);
 Matrix adjoint(Matrix &l); 

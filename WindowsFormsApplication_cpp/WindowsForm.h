@@ -86,6 +86,7 @@ namespace WindowsFormsApplication_cpp {
 	private: System::Windows::Forms::ToolStripMenuItem^  LoadMatrixToolStripMenuItem;
 	private: System::Windows::Forms::OpenFileDialog^  openFileDialog2;
 	private: int contextOP = 0;
+	private: System::Windows::Forms::CheckBox^  checkBox1;
 
 			 /// </summary>
 		System::ComponentModel::Container ^components;
@@ -112,6 +113,7 @@ namespace WindowsFormsApplication_cpp {
 			this->Output = (gcnew System::Windows::Forms::TextBox());
 			this->openFileDialog1 = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->openFileDialog2 = (gcnew System::Windows::Forms::OpenFileDialog());
+			this->checkBox1 = (gcnew System::Windows::Forms::CheckBox());
 			this->menuStrip2->SuspendLayout();
 			this->tableLayoutPanel1->SuspendLayout();
 			this->flowLayoutPanel1->SuspendLayout();
@@ -120,10 +122,12 @@ namespace WindowsFormsApplication_cpp {
 			// 
 			// menuStrip2
 			// 
+			this->menuStrip2->ImageScalingSize = System::Drawing::Size(20, 20);
 			this->menuStrip2->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->FileToolStripMenuItem });
 			this->menuStrip2->Location = System::Drawing::Point(0, 0);
 			this->menuStrip2->Name = L"menuStrip2";
-			this->menuStrip2->Size = System::Drawing::Size(657, 24);
+			this->menuStrip2->Padding = System::Windows::Forms::Padding(8, 2, 0, 2);
+			this->menuStrip2->Size = System::Drawing::Size(876, 27);
 			this->menuStrip2->TabIndex = 1;
 			this->menuStrip2->Text = L"menuStrip2";
 			// 
@@ -134,20 +138,20 @@ namespace WindowsFormsApplication_cpp {
 					this->LoadMatrixToolStripMenuItem
 			});
 			this->FileToolStripMenuItem->Name = L"FileToolStripMenuItem";
-			this->FileToolStripMenuItem->Size = System::Drawing::Size(38, 20);
+			this->FileToolStripMenuItem->Size = System::Drawing::Size(45, 23);
 			this->FileToolStripMenuItem->Text = L"File";
 			// 
 			// LoadVectorToolStripMenuItem
 			// 
 			this->LoadVectorToolStripMenuItem->Name = L"LoadVectorToolStripMenuItem";
-			this->LoadVectorToolStripMenuItem->Size = System::Drawing::Size(143, 22);
+			this->LoadVectorToolStripMenuItem->Size = System::Drawing::Size(216, 26);
 			this->LoadVectorToolStripMenuItem->Text = L"Load Vector";
 			this->LoadVectorToolStripMenuItem->Click += gcnew System::EventHandler(this, &WindowsForm::LoadVectorToolStripMenuItem_Click);
 			// 
 			// LoadMatrixToolStripMenuItem
 			// 
 			this->LoadMatrixToolStripMenuItem->Name = L"LoadMatrixToolStripMenuItem";
-			this->LoadMatrixToolStripMenuItem->Size = System::Drawing::Size(143, 22);
+			this->LoadMatrixToolStripMenuItem->Size = System::Drawing::Size(216, 26);
 			this->LoadMatrixToolStripMenuItem->Text = L"Load Matrix";
 			this->LoadMatrixToolStripMenuItem->Click += gcnew System::EventHandler(this, &WindowsForm::LoadMatrixToolStripMenuItem_Click);
 			// 
@@ -161,12 +165,13 @@ namespace WindowsFormsApplication_cpp {
 			this->tableLayoutPanel1->Controls->Add(this->flowLayoutPanel1, 1, 0);
 			this->tableLayoutPanel1->Controls->Add(this->flowLayoutPanel2, 0, 0);
 			this->tableLayoutPanel1->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->tableLayoutPanel1->Location = System::Drawing::Point(0, 24);
+			this->tableLayoutPanel1->Location = System::Drawing::Point(0, 27);
+			this->tableLayoutPanel1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->tableLayoutPanel1->Name = L"tableLayoutPanel1";
 			this->tableLayoutPanel1->RowCount = 1;
 			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 100)));
-			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 20)));
-			this->tableLayoutPanel1->Size = System::Drawing::Size(657, 482);
+			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 25)));
+			this->tableLayoutPanel1->Size = System::Drawing::Size(876, 606);
 			this->tableLayoutPanel1->TabIndex = 2;
 			// 
 			// flowLayoutPanel1
@@ -175,9 +180,10 @@ namespace WindowsFormsApplication_cpp {
 			this->flowLayoutPanel1->Controls->Add(this->Input);
 			this->flowLayoutPanel1->Controls->Add(this->VectorLabel);
 			this->flowLayoutPanel1->Controls->Add(this->VariableList);
-			this->flowLayoutPanel1->Location = System::Drawing::Point(394, 3);
+			this->flowLayoutPanel1->Location = System::Drawing::Point(526, 4);
+			this->flowLayoutPanel1->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->flowLayoutPanel1->Name = L"flowLayoutPanel1";
-			this->flowLayoutPanel1->Size = System::Drawing::Size(260, 474);
+			this->flowLayoutPanel1->Size = System::Drawing::Size(346, 595);
 			this->flowLayoutPanel1->TabIndex = 0;
 			// 
 			// InputLabel
@@ -186,18 +192,20 @@ namespace WindowsFormsApplication_cpp {
 			this->InputLabel->AutoSize = true;
 			this->InputLabel->Font = (gcnew System::Drawing::Font(L"微軟正黑體", 9, static_cast<System::Drawing::FontStyle>((System::Drawing::FontStyle::Bold | System::Drawing::FontStyle::Italic)),
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(136)));
-			this->InputLabel->Location = System::Drawing::Point(3, 0);
+			this->InputLabel->Location = System::Drawing::Point(4, 0);
+			this->InputLabel->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->InputLabel->Name = L"InputLabel";
-			this->InputLabel->Size = System::Drawing::Size(41, 16);
+			this->InputLabel->Size = System::Drawing::Size(48, 19);
 			this->InputLabel->TabIndex = 0;
 			this->InputLabel->Text = L"Input";
 			// 
 			// Input
 			// 
-			this->Input->Location = System::Drawing::Point(3, 19);
+			this->Input->Location = System::Drawing::Point(4, 23);
+			this->Input->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->Input->Multiline = true;
 			this->Input->Name = L"Input";
-			this->Input->Size = System::Drawing::Size(254, 167);
+			this->Input->Size = System::Drawing::Size(337, 208);
 			this->Input->TabIndex = 1;
 			this->Input->TextChanged += gcnew System::EventHandler(this, &WindowsForm::Input_TextChanged);
 			// 
@@ -207,9 +215,10 @@ namespace WindowsFormsApplication_cpp {
 			this->VectorLabel->AutoSize = true;
 			this->VectorLabel->Font = (gcnew System::Drawing::Font(L"微軟正黑體", 9, static_cast<System::Drawing::FontStyle>((System::Drawing::FontStyle::Bold | System::Drawing::FontStyle::Italic)),
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(136)));
-			this->VectorLabel->Location = System::Drawing::Point(3, 189);
+			this->VectorLabel->Location = System::Drawing::Point(4, 235);
+			this->VectorLabel->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->VectorLabel->Name = L"VectorLabel";
-			this->VectorLabel->Size = System::Drawing::Size(47, 16);
+			this->VectorLabel->Size = System::Drawing::Size(58, 19);
 			this->VectorLabel->TabIndex = 2;
 			this->VectorLabel->Text = L"Vector";
 			// 
@@ -217,19 +226,22 @@ namespace WindowsFormsApplication_cpp {
 			// 
 			this->VariableList->FormattingEnabled = true;
 			this->VariableList->HorizontalScrollbar = true;
-			this->VariableList->ItemHeight = 12;
-			this->VariableList->Location = System::Drawing::Point(3, 208);
+			this->VariableList->ItemHeight = 15;
+			this->VariableList->Location = System::Drawing::Point(4, 258);
+			this->VariableList->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->VariableList->Name = L"VariableList";
-			this->VariableList->Size = System::Drawing::Size(254, 256);
+			this->VariableList->Size = System::Drawing::Size(337, 319);
 			this->VariableList->TabIndex = 3;
 			// 
 			// flowLayoutPanel2
 			// 
 			this->flowLayoutPanel2->Controls->Add(this->OutputLabel);
 			this->flowLayoutPanel2->Controls->Add(this->Output);
-			this->flowLayoutPanel2->Location = System::Drawing::Point(3, 3);
+			this->flowLayoutPanel2->Controls->Add(this->checkBox1);
+			this->flowLayoutPanel2->Location = System::Drawing::Point(4, 4);
+			this->flowLayoutPanel2->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->flowLayoutPanel2->Name = L"flowLayoutPanel2";
-			this->flowLayoutPanel2->Size = System::Drawing::Size(385, 476);
+			this->flowLayoutPanel2->Size = System::Drawing::Size(513, 595);
 			this->flowLayoutPanel2->TabIndex = 1;
 			// 
 			// OutputLabel
@@ -238,9 +250,10 @@ namespace WindowsFormsApplication_cpp {
 			this->OutputLabel->AutoSize = true;
 			this->OutputLabel->Font = (gcnew System::Drawing::Font(L"微軟正黑體", 9, static_cast<System::Drawing::FontStyle>((System::Drawing::FontStyle::Bold | System::Drawing::FontStyle::Italic)),
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(136)));
-			this->OutputLabel->Location = System::Drawing::Point(3, 0);
+			this->OutputLabel->Location = System::Drawing::Point(4, 0);
+			this->OutputLabel->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->OutputLabel->Name = L"OutputLabel";
-			this->OutputLabel->Size = System::Drawing::Size(52, 16);
+			this->OutputLabel->Size = System::Drawing::Size(61, 19);
 			this->OutputLabel->TabIndex = 0;
 			this->OutputLabel->Text = L"Output";
 			// 
@@ -248,12 +261,13 @@ namespace WindowsFormsApplication_cpp {
 			// 
 			this->Output->Font = (gcnew System::Drawing::Font(L"新細明體", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(136)));
-			this->Output->Location = System::Drawing::Point(3, 19);
+			this->Output->Location = System::Drawing::Point(4, 23);
+			this->Output->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->Output->Multiline = true;
 			this->Output->Name = L"Output";
 			this->Output->ReadOnly = true;
 			this->Output->ScrollBars = System::Windows::Forms::ScrollBars::Both;
-			this->Output->Size = System::Drawing::Size(375, 455);
+			this->Output->Size = System::Drawing::Size(499, 568);
 			this->Output->TabIndex = 1;
 			this->Output->WordWrap = false;
 			// 
@@ -267,13 +281,24 @@ namespace WindowsFormsApplication_cpp {
 			this->openFileDialog2->FileName = L"openFileDialog2";
 			this->openFileDialog2->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &WindowsForm::openFileDialog2_FileOk);
 			// 
+			// checkBox1
+			// 
+			this->checkBox1->AutoSize = true;
+			this->checkBox1->Location = System::Drawing::Point(3, 598);
+			this->checkBox1->Name = L"checkBox1";
+			this->checkBox1->Size = System::Drawing::Size(91, 19);
+			this->checkBox1->TabIndex = 2;
+			this->checkBox1->Text = L"checkBox1";
+			this->checkBox1->UseVisualStyleBackColor = true;
+			// 
 			// WindowsForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 12);
+			this->AutoScaleDimensions = System::Drawing::SizeF(8, 15);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(657, 506);
+			this->ClientSize = System::Drawing::Size(876, 633);
 			this->Controls->Add(this->tableLayoutPanel1);
 			this->Controls->Add(this->menuStrip2);
+			this->Margin = System::Windows::Forms::Padding(4, 4, 4, 4);
 			this->Name = L"WindowsForm";
 			this->Text = L"VectorExample";
 			this->Load += gcnew System::EventHandler(this, &WindowsForm::WindowsForm_Load);
@@ -931,16 +956,20 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 						Output->Text += "Error, matrix " + userCommand[1] + " undefined." + Environment::NewLine;
 					}
 					else {
-						std::vector<std::vector<std::string>> result = eigenValue(matrices[left_v]);
+						std::vector<Vector> result = eigenValue(matrices[left_v]);
 						Output->Text += "result =" + Environment::NewLine;
-						for (int i = 0; i < result.size(); ++i) {
-							std::vector<std::string>& answears = result[i];
-							Output->Text += "A" + i.ToString() + ": " + Environment::NewLine;
-							for (int j = 0; j < answears.size(); ++j) {
-								Output->Text += gcnew String(answears[j].c_str()) + Environment::NewLine;
-							}
+						Vector & eigens = result[0];
+						for (int i = 0; i < eigens.dim(); ++i) {
+							Output->Text += eigens[i].ToString() + " ";
 						}
-						Output->Text += Environment::NewLine;
+						Output->Text +=  Environment::NewLine;
+						for (int i = 1; i < result.size(); ++i) {
+							Vector& eigenVector = result[i];
+							for (int j = 0; j < eigenVector.dim(); ++j) {
+								Output->Text += eigenVector[j].ToString() + " ";
+							}
+							Output->Text += Environment::NewLine;
+						}
 					}
 				}
 				}
@@ -1007,10 +1036,13 @@ private: System::Void Input_TextChanged(System::Object^  sender, System::EventAr
 						Output->Text += "Error, matrix " + userCommand[2] + " undefined." + Environment::NewLine;
 					}
 					else {
-						Vector result = leastsquare(matrices[left_v], matrices[right_v]);
+						Matrix result = leastsquare(matrices[left_v], matrices[right_v]);
 						Output->Text += "result =" + Environment::NewLine;
-						for (int i = 0; i < result.dim(); ++i) {
-							Output->Text += result[i].ToString() + ": " + Environment::NewLine;
+						for (int i = 0; i < result.rows; ++i) {
+							for (int j = 0; j < result.cols; ++j) {
+								Output->Text += result[i][j].ToString() + " " ;
+							}
+							Output->Text += Environment::NewLine;
 						}
 					}
 				}
